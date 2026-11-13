@@ -205,9 +205,8 @@ section { scroll-margin-top: 5rem; }
 }
 .thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .pub h3 { margin: 0 0 0.35rem; font-size: var(--step-1); line-height: 1.4; font-weight: 600; text-wrap: balance; }
-.ptitle { color: var(--fg); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
-.ptitle:hover { color: var(--accent); text-decoration-color: var(--accent); }
-.ptitle::after { content: " ↗"; font-size: 0.8em; color: var(--accent); }
+.ptitle { color: var(--fg); text-decoration: none; transition: color 0.15s; }
+.ptitle:hover { color: var(--accent); text-decoration: none; }
 .authors { margin: 0; font-size: 0.9rem; color: var(--fg-dim); }
 .authors b { color: var(--fg); font-weight: 600; text-decoration: underline; text-decoration-color: var(--accent2); text-underline-offset: 3px; }
 .venue { margin: 0.2rem 0 0; font-size: 0.9rem; font-style: italic; color: var(--fg-dim); }

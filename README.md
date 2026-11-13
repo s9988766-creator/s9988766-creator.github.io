@@ -12,7 +12,7 @@ I work on **deep learning for medical image analysis**, mainly **deformable brai
   **Bo-Wei Lai**, Li-Fen Chen<br>
   *MICCAI 2026 Workshop on Machine Learning in Clinical Neuroimaging (MLCN)*
   · [paper (open access)](https://papers.miccai.org/miccai-2026-sat/paper/MLCN_2026_035.pdf)
-  · [project page](https://github.com/s9988766-creator/miccai2026-mlcn-brain-tumor-audit)<br>
+  · [project page](https://github.com/s9988766-creator/MLCN-MICCAI2026-brain-tumor-audit)<br>
   <sub>A retraining-free audit of a ResNet-50 (96.46% patient-level 5-fold accuracy) using out-of-fold embeddings: fine-tuning raises radiomic alignment about fourfold, and shifted-input controls show attention follows meningioma and pituitary tumors while glioma attention stays diffuse.</sub>
 
 - **Where Should Iterative Registration Refine? A Controlled Analysis of the Accuracy–Topology Front**<br>
@@ -30,7 +30,7 @@ I work on **deep learning for medical image analysis**, mainly **deformable brai
 
 ### 🔬 Other projects
 
-- [Course project: Mammography mass classification on CBIS-DDSM](https://github.com/s9988766-creator/Machine-Learning-Algorithm-and-Its-Application-Course-Final-project) (Machine Learning Algorithms and Applications, Prof. Shin-Jye Lee, Feb–Jun 2026): nine-person team project comparing hand-crafted features + KNN (malignant recall 59.5% → 83.8% after tuning) with transfer-learned CNNs (best test AUC 0.77)
+- [Course project: Mammography mass classification on CBIS-DDSM](https://github.com/s9988766-creator/CourseProject-ml-mammography) (Machine Learning Algorithms and Applications, Prof. Shin-Jye Lee, Feb–Jun 2026): nine-person team project comparing hand-crafted features + KNN (malignant recall 59.5% → 83.8% after tuning) with transfer-learned CNNs (best test AUC 0.77)
 - [Neuroimaging research notes](https://github.com/s9988766-creator/neuroimaging-research-notes): paper readings and notes on neuroimaging analysis and generative models
 
 ### 🛠️ Tools

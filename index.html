@@ -12,8 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
 /* Layout: academicpages skeleton (sticky masthead, profile sidebar left, content right), dressed as a retro beige computer lab:
-   parchment ground, burnt-orange accent, slate-indigo ink. Pixel face only on the name and section labels; reading text in Inter / Noto Sans TC.
-   Light-first; a dark "night terminal" variant via the toggle. */
+   parchment ground, burnt-orange accent, slate-indigo ink. Pixel face only on the name and section labels; reading text in Inter / Noto Sans TC. */
 :root {
   --bg: #ebe4d8;
   --bg-grid: rgba(75, 79, 134, 0.06);
@@ -43,26 +42,6 @@
   --step-2: 1.375rem;
   --step-3: 1.875rem;
   color-scheme: light;
-}
-:root[data-theme="dark"] {
-  --bg: #1c1b2b;
-  --bg-grid: rgba(236, 228, 216, 0.035);
-  --panel: #24233a;
-  --panel-2: #2c2b45;
-  --line: #3b3a5a;
-  --fg: #ece4d8;
-  --fg-dim: #aaa5bb;
-  --accent: #ff8a4c;
-  --accent2: #b2b5f5;
-  --amber: #f0b54a;
-  --mint: #7fd39a;
-  --accent-soft: rgba(255, 138, 76, 0.14);
-  --accent2-soft: rgba(178, 181, 245, 0.12);
-  --amber-soft: rgba(240, 181, 74, 0.13);
-  --mint-soft: rgba(127, 211, 154, 0.12);
-  --scan: rgba(0, 0, 0, 0.18);
-  --glow: 0 0 0 1px rgba(255, 138, 76, 0.45), 0 0 16px rgba(255, 138, 76, 0.15);
-  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -116,12 +95,6 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   color: var(--fg-dim); padding: 0.3rem 0.6rem; border-radius: 6px;
 }
 .nav a:hover { color: var(--fg); background: var(--panel-2); text-decoration: none; }
-.theme-btn {
-  font-family: var(--font-mono); font-size: var(--step--1);
-  background: transparent; color: var(--fg-dim);
-  border: 1px solid var(--line); border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer;
-}
-.theme-btn:hover { color: var(--fg); border-color: var(--accent); }
 
 /* ---------- page grid ---------- */
 .page {
@@ -314,7 +287,6 @@ footer {
       <a href="#experience">Research</a>
       <a href="#skills">Skills</a>
     </nav>
-    <button class="theme-btn" id="theme-toggle" type="button" aria-label="Switch color theme">☾ dark</button>
   </div>
 </header>
 
@@ -510,21 +482,6 @@ footer {
 
 <script>
 (function () {
-  var root = document.documentElement;
-  var btn = document.getElementById('theme-toggle');
-  function label() {
-    var dark = root.getAttribute('data-theme') === 'dark';
-    btn.textContent = dark ? '☀ light' : '☾ dark';
-  }
-  btn.addEventListener('click', function () {
-    var dark = root.getAttribute('data-theme') === 'dark';
-    root.setAttribute('data-theme', dark ? 'light' : 'dark');
-    try { localStorage.setItem('bwl-theme', dark ? 'light' : 'dark'); } catch (e) {}
-    label();
-  });
-  try { var t = localStorage.getItem('bwl-theme'); if (t) root.setAttribute('data-theme', t); } catch (e) {}
-  label();
-
   var copy = document.getElementById('copy-email');
   copy.addEventListener('click', function () {
     var text = document.getElementById('email').textContent;

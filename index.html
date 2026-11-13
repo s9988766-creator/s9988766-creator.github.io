@@ -205,6 +205,9 @@ section { scroll-margin-top: 5rem; }
 }
 .thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .pub h3 { margin: 0 0 0.35rem; font-size: var(--step-1); line-height: 1.4; font-weight: 600; text-wrap: balance; }
+.ptitle { color: var(--fg); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
+.ptitle:hover { color: var(--accent); text-decoration-color: var(--accent); }
+.ptitle::after { content: " ↗"; font-size: 0.8em; color: var(--accent); }
 .authors { margin: 0; font-size: 0.9rem; color: var(--fg-dim); }
 .authors b { color: var(--fg); font-weight: 600; text-decoration: underline; text-decoration-color: var(--accent2); text-underline-offset: 3px; }
 .venue { margin: 0.2rem 0 0; font-size: 0.9rem; font-style: italic; color: var(--fg-dim); }
@@ -362,13 +365,12 @@ footer {
         <article class="pub">
           <div class="thumb"><img src="img/mlcn.jpg" alt="Grad-CAM attention following brain tumors shifted to the image corner" loading="lazy"></div>
           <div>
-            <h3>Do CNNs Learn Clinically Meaningful Imaging Representations? A Portable Multi-level Representation Audit for Brain Tumor MRI Classification</h3>
+            <h3><a class="ptitle" href="https://papers.miccai.org/miccai-2026-sat/paper/MLCN_2026_035.pdf" target="_blank" rel="noopener">Do CNNs Learn Clinically Meaningful Imaging Representations? A Portable Multi-level Representation Audit for Brain Tumor MRI Classification</a></h3>
             <p class="authors"><b>Bo-Wei Lai</b>, Li-Fen Chen</p>
             <p class="venue">MICCAI 2026 Workshop on Machine Learning in Clinical Neuroimaging (MLCN)</p>
             <p class="tldr">A retraining-free audit of a ResNet-50 at <span class="num">96.46%</span> patient-level accuracy: radiomic alignment rises about <span class="num">4×</span> after fine-tuning, and attention tracks meningioma and pituitary tumors while glioma attention stays diffuse.</p>
             <div class="pub-foot">
               <span class="status s-pub">published · poster</span>
-              <a class="plink" href="https://papers.miccai.org/miccai-2026-sat/paper/MLCN_2026_035.pdf" target="_blank" rel="noopener">[paper]</a>
               <a class="plink" href="https://github.com/s9988766-creator/miccai2026-mlcn-brain-tumor-audit" target="_blank" rel="noopener">[project]</a>
             </div>
           </div>
@@ -391,13 +393,12 @@ footer {
         <article class="pub">
           <div class="thumb"><img src="img/gcbme.jpg" alt="Dice versus folding rate for ten registration models" loading="lazy"></div>
           <div>
-            <h3>A Matched-Protocol Ablation of Deep Brain MRI Registration: Supervision, Step Composition, and Deformation Regularity</h3>
+            <h3><a class="ptitle" href="papers/GCBME2026_Lai_Chiang_Yang.pdf" target="_blank" rel="noopener">A Matched-Protocol Ablation of Deep Brain MRI Registration: Supervision, Step Composition, and Deformation Regularity</a></h3>
             <p class="authors"><b>Bo-Wei Lai</b>, Ming-Chang Chiang, Po-Kai Yang</p>
             <p class="venue">GCBME 2026, Annual Meeting of the Taiwanese Society of Biomedical Engineering</p>
             <p class="tldr">Ten models under one verified protocol: supervision moves Dice more than any architecture, and composing velocity steps instead of adding them cuts folding <span class="num">48.8×</span>.</p>
             <div class="pub-foot">
               <span class="status s-acc">accepted</span>
-              <a class="plink" href="https://github.com/s9988766-creator/gcbme2026-brain-registration/blob/main/docs/GCBME2026_Lai_Chiang_Yang.pdf" target="_blank" rel="noopener">[paper]</a>
               <a class="plink" href="https://github.com/s9988766-creator/gcbme2026-brain-registration" target="_blank" rel="noopener">[code]</a>
             </div>
           </div>

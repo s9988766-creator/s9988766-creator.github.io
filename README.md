@@ -18,14 +18,14 @@ I work on **deep learning for medical image analysis**, mainly **deformable brai
 - **Where Should Iterative Registration Refine? A Controlled Analysis of the Accuracy–Topology Front**<br>
   **Bo-Wei Lai**, Ming-Chang Chiang, Po-Kai Yang<br>
   *Submitted to IEEE ISBI 2027 (under review)*
-  · [code & per-subject results](https://github.com/s9988766-creator/isbi2027-iterative-registration)<br>
+  · [code & per-subject results](https://github.com/s9988766-creator/IEEE-ISBI2027-iterative-registration)<br>
   <sub>Stationary-velocity refinement keeps +0.0758 Dice (95% CI [0.0720, 0.0799]) over displacement refinement at zero interior folding; 46 training runs with seed-and-subject bootstrap CIs.</sub>
 
 - **A Matched-Protocol Ablation of Deep Brain MRI Registration: Supervision, Step Composition, and Deformation Regularity**<br>
   **Bo-Wei Lai**, Ming-Chang Chiang, Po-Kai Yang<br>
   *GCBME 2026, Annual Meeting of the Taiwanese Society of Biomedical Engineering*
-  · [paper](https://github.com/s9988766-creator/gcbme2026-brain-registration/blob/main/docs/GCBME2026_Lai_Chiang_Yang.pdf)
-  · [code & per-subject results](https://github.com/s9988766-creator/gcbme2026-brain-registration)<br>
+  · [paper](https://github.com/s9988766-creator/GCBME2026-brain-registration/blob/main/docs/GCBME2026_Lai_Chiang_Yang.pdf)
+  · [code & per-subject results](https://github.com/s9988766-creator/GCBME2026-brain-registration)<br>
   <sub>Reproduces all 11 published TransMorph-IXI benchmark numbers; composing rather than adding velocity steps reduces folding 48.8× at a matched backbone.</sub>
 
 ### 🔬 Other projects

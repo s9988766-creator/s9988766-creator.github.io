@@ -30,7 +30,7 @@ I work on **deep learning for medical image analysis**, mainly **deformable brai
 
 ### 🔬 Other projects
 
-- [Course project: Mammography mass classification on CBIS-DDSM](https://github.com/s9988766-creator/Machine-Learning-Algorithm-and-Its-Application-Course-Final-project) (Machine Learning Algorithms and Applications, Prof. Shin-Jye Lee, Feb–Jun 2026): hand-crafted shape features + KNN vs. transfer-learned CNNs under a patient-level split; best test AUC 0.77 (ResNet18 with lesion bounding-box crop)
+- [Course project: Mammography mass classification on CBIS-DDSM](https://github.com/s9988766-creator/Machine-Learning-Algorithm-and-Its-Application-Course-Final-project) (Machine Learning Algorithms and Applications, Prof. Shin-Jye Lee, Feb–Jun 2026): nine-person team project comparing hand-crafted features + KNN (malignant recall 59.5% → 83.8% after tuning) with transfer-learned CNNs (best test AUC 0.77)
 - [Neuroimaging research notes](https://github.com/s9988766-creator/neuroimaging-research-notes): paper readings and notes on neuroimaging analysis and generative models
 
 ### 🛠️ Tools

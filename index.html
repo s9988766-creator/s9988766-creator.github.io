@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Bo-Wei Lai, biomedical engineering undergraduate at NYCU working on deep learning for brain MRI.">
+<link rel="icon" type="image/png" href="img/avatar.png">
+<style>body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+<title>Bo-Wei Lai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: academicpages skeleton (sticky masthead, profile sidebar left, content right), dressed as a retro beige computer lab:
+   parchment ground, burnt-orange accent, slate-indigo ink. Pixel face only on the name and section labels; reading text in Inter / Noto Sans TC.
+   Light-first; a dark "night terminal" variant via the toggle. */
+:root {
+  --bg: #ebe4d8;
+  --bg-grid: rgba(75, 79, 134, 0.06);
+  --panel: #f6f1e8;
+  --panel-2: #efe7da;
+  --line: #d8ccb8;
+  --fg: #33324d;
+  --fg-dim: #67647c;
+  --accent: #d2602a;
+  --accent2: #4b4f86;
+  --amber: #a8681a;
+  --mint: #3c7a4c;
+  --accent-soft: rgba(210, 96, 42, 0.12);
+  --accent2-soft: rgba(75, 79, 134, 0.1);
+  --amber-soft: rgba(168, 104, 26, 0.12);
+  --mint-soft: rgba(60, 122, 76, 0.12);
+  --scan: rgba(51, 50, 77, 0.06);
+  --glow: 0 0 0 1px rgba(210, 96, 42, 0.45), 0 6px 16px rgba(51, 50, 77, 0.1);
+
+  --font-pixel: "Silkscreen", "JetBrains Mono", ui-monospace, monospace;
+  --font-body: "Inter", "Noto Sans TC", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: 1.375rem;
+  --step-3: 1.875rem;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #1c1b2b;
+  --bg-grid: rgba(236, 228, 216, 0.035);
+  --panel: #24233a;
+  --panel-2: #2c2b45;
+  --line: #3b3a5a;
+  --fg: #ece4d8;
+  --fg-dim: #aaa5bb;
+  --accent: #ff8a4c;
+  --accent2: #b2b5f5;
+  --amber: #f0b54a;
+  --mint: #7fd39a;
+  --accent-soft: rgba(255, 138, 76, 0.14);
+  --accent2-soft: rgba(178, 181, 245, 0.12);
+  --amber-soft: rgba(240, 181, 74, 0.13);
+  --mint-soft: rgba(127, 211, 154, 0.12);
+  --scan: rgba(0, 0, 0, 0.18);
+  --glow: 0 0 0 1px rgba(255, 138, 76, 0.45), 0 0 16px rgba(255, 138, 76, 0.15);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.65;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10;
+  background: var(--panel);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; border-radius: 4px; }
+
+/* ---------- masthead ---------- */
+.masthead {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.masthead-inner {
+  max-width: 1120px; margin: 0 auto;
+  padding-block: 0.7rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;
+}
+.brand {
+  font-family: var(--font-pixel); font-size: 1rem; letter-spacing: 0.04em;
+  color: var(--fg); display: flex; align-items: center; gap: 0.5rem;
+}
+.brand .prompt { color: var(--accent2); }
+.cursor {
+  display: inline-block; width: 0.55em; height: 1em; background: var(--accent);
+  vertical-align: -0.12em; animation: blink 1.1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+.nav { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-left: auto; }
+.nav a {
+  font-family: var(--font-mono); font-size: var(--step--1);
+  color: var(--fg-dim); padding: 0.3rem 0.6rem; border-radius: 6px;
+}
+.nav a:hover { color: var(--fg); background: var(--panel-2); text-decoration: none; }
+.theme-btn {
+  font-family: var(--font-mono); font-size: var(--step--1);
+  background: transparent; color: var(--fg-dim);
+  border: 1px solid var(--line); border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer;
+}
+.theme-btn:hover { color: var(--fg); border-color: var(--accent); }
+
+/* ---------- page grid ---------- */
+.page {
+  max-width: 1120px; margin: 0 auto;
+  padding-block: 2rem 4rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: 272px minmax(0, 1fr); gap: 2.5rem; align-items: start;
+}
+
+/* ---------- sidebar profile ---------- */
+.profile {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + 4.5rem);
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 1.4rem; display: grid; gap: 1rem;
+}
+.avatar {
+  width: 132px; aspect-ratio: 1; max-width: 100%; border-radius: 12px; position: relative; overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 3px, var(--scan) 3px 4px),
+    linear-gradient(135deg, var(--accent-soft), var(--accent2-soft)), var(--panel-2);
+  box-shadow: var(--glow);
+  display: grid; place-items: center;
+  font-family: var(--font-pixel); font-size: 2.1rem; color: var(--accent); letter-spacing: 0.05em;
+}
+.avatar small {
+  position: absolute; bottom: 6px; left: 0; right: 0; text-align: center;
+  font-family: var(--font-mono); font-size: 0.62rem; color: var(--fg-dim); letter-spacing: 0;
+}
+.who h1 {
+  margin: 0; font-family: var(--font-pixel); font-weight: 700; font-size: 1.35rem; line-height: 1.25; letter-spacing: 0.02em; color: var(--accent);
+}
+.who .zh { font-family: "Noto Sans TC", var(--font-body); font-weight: 500; color: var(--fg-dim); font-size: var(--step-0); }
+.who p { margin: 0.5rem 0 0; color: var(--fg-dim); font-size: 0.9rem; line-height: 1.5; }
+.meta { display: grid; gap: 0.4rem; font-size: 0.875rem; color: var(--fg-dim); }
+.meta div { display: flex; gap: 0.5rem; align-items: baseline; }
+.meta .k { font-family: var(--font-mono); font-size: 0.72rem; color: var(--accent2); min-width: 2.6rem; }
+.avatar.has-photo { background: transparent; box-shadow: none; border-radius: 0; overflow: visible; }
+.avatar.has-photo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.profile .avatar { justify-self: center; }
+.profile .who { text-align: center; }
+.edu { display: grid; gap: 0.7rem; border-top: 1px dashed var(--line); padding-top: 0.9rem; }
+.edu-label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--accent); }
+.edu-item { display: grid; gap: 0.1rem; font-size: 0.875rem; line-height: 1.45; }
+.edu-item b { font-weight: 600; color: var(--fg); }
+.edu-item span { color: var(--fg-dim); }
+.edu-item .edu-mono { font-family: var(--font-mono); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+.tl .zh-title { margin: 0.1rem 0 0; font-family: "Noto Sans TC", var(--font-body); font-size: 0.85rem; color: var(--fg-dim); }
+.tl li .status { font-size: 1em; letter-spacing: 0.02em; padding: 0.02rem 0.4rem; margin-right: 0.4rem; }
+.links { display: grid; gap: 0.45rem; }
+.link-btn {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.5rem 0.7rem; border-radius: 9px; border: 1px solid var(--line);
+  background: var(--panel-2); color: var(--fg); font-size: 0.9rem;
+}
+.link-btn:hover { border-color: var(--accent); box-shadow: var(--glow); text-decoration: none; }
+.link-btn .ico { width: 18px; height: 18px; flex: none; color: var(--accent); }
+.link-btn .tag { margin-left: auto; font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-dim); }
+.email-row { display: flex; gap: 0.4rem; align-items: center; }
+.email-row code {
+  flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: 0.78rem;
+  color: var(--fg-dim); user-select: all;
+}
+.copy-btn {
+  font-family: var(--font-mono); font-size: 0.7rem; background: transparent; color: var(--accent);
+  border: 1px solid var(--line); border-radius: 6px; padding: 0.15rem 0.45rem; cursor: pointer;
+}
+
+/* ---------- main ---------- */
+main { display: grid; gap: 3rem; min-width: 0; }
+section { scroll-margin-top: 5rem; }
+.sec-label {
+  display: flex; align-items: center; gap: 0.75rem; margin: 0 0 1.1rem;
+  font-family: var(--font-pixel); font-size: 1.05rem; font-weight: 400; letter-spacing: 0.06em; color: var(--accent2);
+}
+.sec-label::before { content: "//"; color: var(--accent); }
+.sec-label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+.lede { max-width: 65ch; margin: 0; font-size: var(--step-1); line-height: 1.7; }
+.lede + .lede { margin-top: 0.9rem; font-size: var(--step-0); color: var(--fg-dim); }
+.lede strong { color: var(--fg); font-weight: 600; }
+.hl-c { color: var(--accent); font-weight: 600; }
+.hl-p { color: var(--accent2); font-weight: 600; }
+
+.interests { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.2rem; }
+.chip {
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--fg-dim); background: var(--panel);
+}
+
+/* news */
+.news { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; }
+.news li {
+  display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 1rem; padding: 0.55rem 0;
+  border-bottom: 1px dashed var(--line);
+}
+.news time { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); font-variant-numeric: tabular-nums; padding-top: 0.12rem; }
+
+/* publications */
+.pubs { display: grid; gap: 1.1rem; }
+.pub {
+  display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 1.25rem;
+  padding: 1.1rem; background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+}
+.pub:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+.thumb {
+  border-radius: 10px; overflow: hidden; background: #fff; border: 1px solid var(--line);
+  align-self: start; aspect-ratio: 16 / 10; display: grid; place-items: center;
+}
+.thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pub h3 { margin: 0 0 0.35rem; font-size: var(--step-1); line-height: 1.4; font-weight: 600; text-wrap: balance; }
+.authors { margin: 0; font-size: 0.9rem; color: var(--fg-dim); }
+.authors b { color: var(--fg); font-weight: 600; text-decoration: underline; text-decoration-color: var(--accent2); text-underline-offset: 3px; }
+.venue { margin: 0.2rem 0 0; font-size: 0.9rem; font-style: italic; color: var(--fg-dim); }
+.pub-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.75rem; }
+.status {
+  font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.18rem 0.55rem; border-radius: 5px; font-weight: 500;
+}
+.s-pub { color: var(--mint); background: var(--mint-soft); }
+.s-acc { color: var(--accent); background: var(--accent-soft); }
+.s-rev { color: var(--amber); background: var(--amber-soft); }
+.plink {
+  font-family: var(--font-mono); font-size: 0.75rem; padding: 0.18rem 0.55rem; border-radius: 5px;
+  border: 1px solid var(--line); color: var(--fg);
+}
+.plink:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+.tldr { margin: 0.6rem 0 0; font-size: 0.9rem; color: var(--fg-dim); max-width: 70ch; }
+.tldr .num { font-family: var(--font-mono); color: var(--fg); font-size: 0.85rem; }
+
+/* experience timeline */
+.timeline { display: grid; gap: 1.4rem; border-left: 1px solid var(--line); margin-left: 0.35rem; padding-left: 1.4rem; }
+.tl { position: relative; }
+.tl::before {
+  content: ""; position: absolute; left: calc(-1.4rem - 5px); top: 0.45rem; width: 9px; height: 9px;
+  background: var(--bg); border: 2px solid var(--accent); border-radius: 2px;
+}
+.tl.pink::before { border-color: var(--accent2); }
+.tl-head { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; align-items: baseline; justify-content: space-between; }
+.tl h4 { margin: 0; font-size: var(--step-0); font-weight: 600; }
+.tl .when { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-dim); font-variant-numeric: tabular-nums; }
+.tl .org { margin: 0.1rem 0 0; font-size: 0.875rem; color: var(--accent); }
+.tl ul { margin: 0.45rem 0 0; padding-left: 1.1rem; color: var(--fg-dim); font-size: 0.92rem; max-width: 70ch; }
+.tl li + li { margin-top: 0.25rem; }
+
+/* education / skills */
+.two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem; }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.2rem; min-width: 0; }
+.box h4 { margin: 0; font-size: var(--step-0); font-weight: 600; }
+.box p { margin: 0.25rem 0 0; color: var(--fg-dim); font-size: 0.9rem; }
+.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.45rem 1rem; margin: 0; font-size: 0.9rem; }
+.kv dt { font-family: var(--font-mono); font-size: 0.74rem; color: var(--accent2); padding-top: 0.18rem; }
+.kv dd { margin: 0; color: var(--fg-dim); }
+.gpa { display: flex; gap: 1.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
+.gpa div { font-family: var(--font-mono); font-size: 0.78rem; color: var(--fg-dim); }
+.gpa b { display: block; font-family: var(--font-pixel); font-weight: 400; font-size: 1.3rem; color: var(--accent); letter-spacing: 0.03em; }
+
+footer {
+  border-top: 1px solid var(--line); margin-top: 1rem; padding-top: 1.2rem;
+  font-family: var(--font-mono); font-size: 0.75rem; color: var(--fg-dim);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .page { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  .profile { position: static; grid-template-columns: auto minmax(0, 1fr); align-items: center; }
+  .profile .edu, .profile .links { grid-column: 1 / -1; }
+  .avatar { width: 96px; font-size: 1.6rem; }
+}
+@media (max-width: 640px) {
+  .pub { grid-template-columns: minmax(0, 1fr); }
+  .thumb { aspect-ratio: 16 / 9; }
+  .two-col { grid-template-columns: minmax(0, 1fr); }
+  .news li { grid-template-columns: minmax(0, 1fr); gap: 0.1rem; }
+  .nav { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor { animation: none; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="#about"><span class="prompt">&gt;</span> bowei.lai<span class="cursor" aria-hidden="true"></span></a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#publications">Publications</a>
+      <a href="#experience">Research</a>
+      <a href="#skills">Skills</a>
+    </nav>
+    <button class="theme-btn" id="theme-toggle" type="button" aria-label="Switch color theme">☾ dark</button>
+  </div>
+</header>
+
+<div class="page">
+  <aside class="profile" aria-label="Profile">
+    <div class="avatar has-photo"><img src="img/avatar.png" alt="Bo-Wei Lai's avatar: a cartoon character thinking with a hand on its chin" width="208" height="220"></div>
+    <div class="who">
+      <h1>Bo-Wei Lai</h1>
+      <div class="zh">賴鉑崴</div>
+    </div>
+    <div class="edu">
+      <div class="edu-label">EDUCATION</div>
+      <div class="edu-item">
+        <b>National Yang Ming Chiao Tung University</b>
+        <span>B.S. in Biomedical Engineering, in progress</span>
+      </div>
+      <div class="edu-item">
+        <b>Yanping High School, Taipei</b>
+        <span class="edu-mono">Graduated 2022</span>
+      </div>
+    </div>
+    <div class="links">
+      <a class="link-btn" href="https://github.com/s9988766-creator" target="_blank" rel="noopener">
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+        GitHub <span class="tag">code</span>
+      </a>
+      <a class="link-btn" href="https://scholar.google.com/citations?user=9zjp-a0AAAAJ" target="_blank" rel="noopener">
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 1 9l11 7 9-5.73V17h2V9L12 2Zm-6.5 11.2v3.3C7 18.1 9.4 19 12 19s5-.9 6.5-2.5v-3.3L12 17.35 5.5 13.2Z"/></svg>
+        Google Scholar <span class="tag">papers</span>
+      </a>
+      <a class="link-btn" href="cv/Bo-Wei_Lai_CV.pdf" target="_blank" rel="noopener">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>
+        CV <span class="tag">pdf</span>
+      </a>
+      <div class="link-btn email-row">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        <code id="email">s9988766@gmail.com</code>
+        <button class="copy-btn" id="copy-email" type="button">copy</button>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <section id="about">
+      <h2 class="sec-label">about</h2>
+      <p class="lede">I'm an undergraduate in <strong>Biomedical Engineering at National Yang Ming Chiao Tung University</strong>. I build and test deep learning methods for brain MRI, mostly <span class="hl-c">deformable registration</span> and <span class="hl-p">auditing what medical imaging models actually learn</span>.</p>
+      <p class="lede">I'm drawn to what a headline accuracy number leaves out: a deformation field that folds, a classifier that leans on shortcuts, attention that misses the lesion. I prefer controlled, reproducible comparisons, and I publish per-subject results alongside the code.</p>
+      <div class="interests" aria-label="Research interests">
+        <span class="chip">image registration</span>
+        <span class="chip">diffeomorphic deformation</span>
+        <span class="chip">flow matching</span>
+        <span class="chip">explainable AI</span>
+        <span class="chip">radiomics</span>
+        <span class="chip">neuroimaging</span>
+      </div>
+    </section>
+
+    <section id="news">
+      <h2 class="sec-label">news</h2>
+      <ul class="news">
+        <li><time>Oct 2026</time><span>Presented a poster at <strong>MLCN 2026</strong>, a MICCAI 2026 workshop in Strasbourg, France.</span></li>
+        <li><time>Oct 2026</time><span>Submitted <em>Where Should Iterative Registration Refine?</em> to <strong>IEEE ISBI 2027</strong>.</span></li>
+        <li><time>Sep 2026</time><span>Registration ablation paper accepted at <strong>GCBME 2026</strong>, the annual meeting of the Taiwanese Society of Biomedical Engineering.</span></li>
+        <li><time>Jul 2026</time><span>Started a summer research internship at the <strong>National Health Research Institutes</strong>.</span></li>
+      </ul>
+    </section>
+
+    <section id="publications">
+      <h2 class="sec-label">publications</h2>
+      <div class="pubs">
+        <article class="pub">
+          <div class="thumb"><img src="img/mlcn.jpg" alt="Grad-CAM attention following brain tumors shifted to the image corner" loading="lazy"></div>
+          <div>
+            <h3>Do CNNs Learn Clinically Meaningful Imaging Representations? A Portable Multi-level Representation Audit for Brain Tumor MRI Classification</h3>
+            <p class="authors"><b>Bo-Wei Lai</b>, Li-Fen Chen</p>
+            <p class="venue">MICCAI 2026 Workshop on Machine Learning in Clinical Neuroimaging (MLCN)</p>
+            <p class="tldr">A retraining-free audit of a ResNet-50 at <span class="num">96.46%</span> patient-level accuracy: radiomic alignment rises about <span class="num">4×</span> after fine-tuning, and attention tracks meningioma and pituitary tumors while glioma attention stays diffuse.</p>
+            <div class="pub-foot">
+              <span class="status s-pub">published · poster</span>
+              <a class="plink" href="https://papers.miccai.org/miccai-2026-sat/paper/MLCN_2026_035.pdf" target="_blank" rel="noopener">[paper]</a>
+              <a class="plink" href="https://github.com/s9988766-creator/miccai2026-mlcn-brain-tumor-audit" target="_blank" rel="noopener">[project]</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="pub">
+          <div class="thumb"><img src="img/isbi.jpg" alt="Dice versus folding rate fronts for velocity and displacement refinement" loading="lazy"></div>
+          <div>
+            <h3>Where Should Iterative Registration Refine? A Controlled Analysis of the Accuracy–Topology Front</h3>
+            <p class="authors"><b>Bo-Wei Lai</b>, Ming-Chang Chiang, Po-Kai Yang</p>
+            <p class="venue">Submitted to IEEE International Symposium on Biomedical Imaging (ISBI 2027)</p>
+            <p class="tldr">At zero folding, refining a stationary velocity field keeps <span class="num">+0.0758</span> Dice over refining displacement, which needs a <span class="num">64×</span> larger smoothness weight to stop folding.</p>
+            <div class="pub-foot">
+              <span class="status s-rev">under review</span>
+              <a class="plink" href="https://github.com/s9988766-creator/isbi2027-iterative-registration" target="_blank" rel="noopener">[code]</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="pub">
+          <div class="thumb"><img src="img/gcbme.jpg" alt="Dice versus folding rate for ten registration models" loading="lazy"></div>
+          <div>
+            <h3>A Matched-Protocol Ablation of Deep Brain MRI Registration: Supervision, Step Composition, and Deformation Regularity</h3>
+            <p class="authors"><b>Bo-Wei Lai</b>, Ming-Chang Chiang, Po-Kai Yang</p>
+            <p class="venue">GCBME 2026, Annual Meeting of the Taiwanese Society of Biomedical Engineering</p>
+            <p class="tldr">Ten models under one verified protocol: supervision moves Dice more than any architecture, and composing velocity steps instead of adding them cuts folding <span class="num">48.8×</span>.</p>
+            <div class="pub-foot">
+              <span class="status s-acc">accepted</span>
+              <a class="plink" href="https://github.com/s9988766-creator/gcbme2026-brain-registration/blob/main/docs/GCBME2026_Lai_Chiang_Yang.pdf" target="_blank" rel="noopener">[paper]</a>
+              <a class="plink" href="https://github.com/s9988766-creator/gcbme2026-brain-registration" target="_blank" rel="noopener">[code]</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="experience">
+      <h2 class="sec-label">research experience</h2>
+      <div class="timeline">
+        <div class="tl">
+          <div class="tl-head"><h4>Undergraduate Research: Audio and Motion Sensing for Activity Recognition</h4><span class="when">Sep 2026 – present</span></div>
+          <p class="org">NYCU Computer Science · Prof. Po-Kai Yang</p>
+          <ul>
+            <li>Studying when sound actually helps wearable activity recognition, testing whether its benefit concentrates in low-movement moments where body-worn motion sensors carry little information.</li>
+            <li>Measuring how competing household sounds erode that benefit, with interference placed in simulated rooms instead of mixed in dry. Long-term motivation: freezing of gait in Parkinson's disease.</li>
+          </ul>
+        </div>
+        <div class="tl pink">
+          <div class="tl-head"><h4>Undergraduate Research: Controlled Studies of Deep Brain MRI Registration</h4><span class="when">Jul – Nov 2026</span></div>
+          <p class="org">NYCU Biomedical Engineering · Prof. Ming-Chang Chiang, and NYCU Computer Science · Prof. Po-Kai Yang</p>
+          <ul>
+            <li>Reimplemented the official TransMorph IXI atlas-to-subject protocol and reproduced the published Dice of all eleven benchmark methods.</li>
+            <li><span class="status s-acc">GCBME 2026 · accepted</span>Trained ten models under one recipe: anatomical supervision moved Dice more than any architecture, and composing velocity steps instead of adding them cut folding 48.8×.</li>
+            <li><span class="status s-rev">ISBI 2027 · under review</span>Compared velocity and displacement refinement at matched folding budgets over 46 training runs; at zero folding, velocity refinement keeps 0.0758 more Dice.</li>
+          </ul>
+        </div>
+        <div class="tl">
+          <div class="tl-head"><h4>Research Intern</h4><span class="when">Jul – Aug 2026</span></div>
+          <p class="org">National Health Research Institutes · Institute of Biomedical Engineering and Nanomedicine · Prof. Lun-De Liao</p>
+          <ul>
+            <li>Built a fully on-premise Whisper → LLM pipeline that drafts home-care nursing records from speech.</li>
+            <li>Confidence-gated drug-name correction raised high-risk keyword recall from 36/46 to 45/46 and cut CER from 11.7% to 8.6%.</li>
+            <li>Rule-based value preservation reached 100% numeric fidelity in summaries.</li>
+          </ul>
+        </div>
+        <div class="tl pink">
+          <div class="tl-head"><h4>Undergraduate Research: Interpretable Tumor Classification</h4><span class="when">Feb – Jul 2026</span></div>
+          <p class="org">NYCU Institute of Brain Science · Prof. Li-Fen Chen</p>
+          <ul>
+            <li><span class="status s-pub">MLCN 2026 @ MICCAI 2026 · published</span>Designed a model-agnostic, retraining-free audit that checks a brain tumor MRI classifier at three levels: how its feature space is organized, whether its features align with radiomic descriptors, and whether its attention falls on the tumor.</li>
+            <li>Fine-tuned ResNet-50 with patient-disjoint five-fold cross-validation (96.46 ± 1.39% accuracy) and audited out-of-fold features: diagnostic clustering reached ARI 0.904, and the share of features strongly aligned with radiomic descriptors rose from 5.6% to 24.5%.</li>
+            <li>Shifted-input controls showed that attention follows meningioma and pituitary tumors when they move off-center, while glioma attention stays diffuse.</li>
+          </ul>
+        </div>
+        <div class="tl">
+          <div class="tl-head"><h4>Undergraduate Research: Lesion-Preserving Brain MRI Normalization with Flow Matching</h4><span class="when">Sep 2025 – Jun 2026</span></div>
+          <p class="org">NYCU Biomedical Engineering · Prof. Ming-Chang Chiang</p>
+          <p class="zh-title">基於流匹配模型之個人化病灶保留結構性腦影像正規化方法</p>
+          <ul>
+            <li>Proposed learning healthy-brain normalization trajectories in a VAE latent space with flow matching, so lesions are not stretched to fit a template.</li>
+            <li>Built the preprocessing pipeline (CAT12 segmentation, skull-stripping) for 92 healthy subjects from OpenNeuro ds005237 and trained a 3D VAE with a 256-dimensional latent space.</li>
+            <li>The GCBME 2026 and ISBI 2027 studies grew out of this project.</li>
+          </ul>
+        </div>
+        <div class="tl pink">
+          <div class="tl-head"><h4>Course Project: Structural Brain Image Analysis</h4><span class="when">Sep – Dec 2025</span></div>
+          <p class="org">NYCU Institute of Brain Science</p>
+          <ul>
+            <li>Compared voxel- and surface-based morphometry (SPM12 / CAT12) for detecting age-related brain change.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills">
+      <h2 class="sec-label">skills</h2>
+      <div class="box">
+        <dl class="kv">
+          <dt>CODE</dt><dd>Python, C/C++, MATLAB, R</dd>
+          <dt>ML</dt><dd>PyTorch, scikit-learn, CNNs, diffusion and flow matching</dd>
+          <dt>IMAGING</dt><dd>Brain MRI preprocessing, image registration, SPM12 / CAT12, morphometry, radiomics</dd>
+          <dt>SPEECH &amp; LLM</dt><dd>Whisper fine-tuning, LoRA, on-premise LLM deployment, ASR evaluation (CER, keyword recall)</dd>
+        </dl>
+      </div>
+    </section>
+
+    <footer>
+      <span>© 2026 Bo-Wei Lai</span>
+      <span>Last updated Nov 2026</span>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.getElementById('theme-toggle');
+  function label() {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    btn.textContent = dark ? '☀ light' : '☾ dark';
+  }
+  btn.addEventListener('click', function () {
+    var dark = root.getAttribute('data-theme') === 'dark';
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+    try { localStorage.setItem('bwl-theme', dark ? 'light' : 'dark'); } catch (e) {}
+    label();
+  });
+  try { var t = localStorage.getItem('bwl-theme'); if (t) root.setAttribute('data-theme', t); } catch (e) {}
+  label();
+
+  var copy = document.getElementById('copy-email');
+  copy.addEventListener('click', function () {
+    var text = document.getElementById('email').textContent;
+    var done = function () { copy.textContent = 'copied'; setTimeout(function () { copy.textContent = 'copy'; }, 1500); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { selectEmail(); });
+    } else { selectEmail(); }
+  });
+  function selectEmail() {
+    var r = document.createRange(); r.selectNodeContents(document.getElementById('email'));
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  }
+})();
+</script>
+
+</body>
+</html>

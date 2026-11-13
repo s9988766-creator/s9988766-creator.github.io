@@ -153,9 +153,9 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .link-btn:hover { border-color: var(--accent); box-shadow: var(--glow); text-decoration: none; }
 .link-btn .ico { width: 18px; height: 18px; flex: none; color: var(--accent); }
 .link-btn .tag { margin-left: auto; font-family: var(--font-mono); font-size: 0.68rem; color: var(--fg-dim); }
-.email-row { display: flex; gap: 0.4rem; align-items: center; }
+.email-row { display: flex; gap: 0.4rem; align-items: center; padding-right: 0.5rem; }
 .email-row code {
-  flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: 0.78rem;
+  flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: -0.01em;
   color: var(--fg-dim); user-select: all;
 }
 .copy-btn {
@@ -283,6 +283,8 @@ footer {
   <div class="masthead-inner">
     <a class="brand" href="#about"><span class="prompt">&gt;</span> bowei.lai<span class="cursor" aria-hidden="true"></span></a>
     <nav class="nav" aria-label="Sections">
+      <a href="#about">About</a>
+      <a href="#news">News</a>
       <a href="#publications">Publications</a>
       <a href="#experience">Research</a>
       <a href="#skills">Skills</a>

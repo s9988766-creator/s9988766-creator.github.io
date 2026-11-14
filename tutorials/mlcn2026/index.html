@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="MLCN 2026 論文中文互動導讀：CNN 學到了什麼？腦腫瘤分類模型的三層檢查。">
+<link rel="icon" type="image/png" href="../../img/avatar.png">
+<style>body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+<title>CNN 表徵審查導讀</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one reading column on the homepage's beige grid paper; lessons in order, with the three audit modules as the spine.
+   Same identity as s9988766-creator.github.io: orange pixel labels, slate-indigo headings, readable Inter / Noto Sans TC body. Light only. */
+:root {
+  --bg: #ebe4d8;
+  --bg-grid: rgba(75, 79, 134, 0.06);
+  --panel: #f6f1e8;
+  --panel-2: #efe7da;
+  --line: #d8ccb8;
+  --fg: #33324d;
+  --fg-dim: #67647c;
+  --accent: #d2602a;
+  --accent2: #4b4f86;
+  --mint: #3c7a4c;
+  --accent-soft: rgba(210, 96, 42, 0.12);
+  --accent2-soft: rgba(75, 79, 134, 0.1);
+  --mint-soft: rgba(60, 122, 76, 0.12);
+  --glioma: #d2602a;
+  --mening: #4b4f86;
+  --pit: #3c7a4c;
+  --tumor: #c0353a;
+  --font-pixel: "Silkscreen", "JetBrains Mono", ui-monospace, monospace;
+  --font-body: "Inter", "Noto Sans TC", system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background-color: var(--bg);
+  background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.8;
+}
+.wrap {
+  max-width: 47rem; margin: 0 auto;
+  padding-block: 2.5rem 5rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; border-radius: 3px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.4; margin: 0; }
+h1 { font-size: clamp(1.6rem, 4.6vw, 2.1rem); font-weight: 700; }
+h2 { font-size: 1.45rem; font-weight: 700; color: var(--accent2); margin-top: 3.4rem; padding-top: 1.3rem; border-top: 1px dashed var(--line); }
+h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1.8rem; }
+p { margin: 0.8rem 0; }
+.eyebrow { font-family: var(--font-pixel); font-size: 0.85rem; letter-spacing: 0.05em; color: var(--accent); }
+.lesson { display: block; font-family: var(--font-pixel); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 0.25rem; font-weight: 400; }
+.lesson::before { content: "// "; }
+.lede { font-size: 1.08rem; color: var(--fg-dim); margin-top: 0.6rem; }
+.meta { font-size: 0.88rem; color: var(--fg-dim); }
+code, .mono { font-family: var(--font-mono); font-size: 0.88em; }
+code { background: var(--accent2-soft); padding: 0.05em 0.35em; border-radius: 3px; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.g { color: var(--glioma); font-weight: 700; } .m { color: var(--mening); font-weight: 700; } .p { color: var(--pit); font-weight: 700; }
+
+.toc { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 1.5rem 0 0; padding: 0; list-style: none; }
+.toc a { display: inline-block; font-size: 0.82rem; color: var(--fg); border: 1px solid var(--line); background: var(--panel); padding: 0.1rem 0.65rem; border-radius: 999px; }
+.toc a:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+.thesis { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px; padding: 1rem 1.25rem; margin-top: 1.6rem; font-size: 1.04rem; }
+.legend { font-size: 0.9rem; color: var(--fg-dim); margin-top: 1rem; }
+.links { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1rem; }
+.plink { font-family: var(--font-mono); font-size: 0.78rem; padding: 0.15rem 0.6rem; border-radius: 5px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); }
+.plink:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.analogy { border-left: 3px solid var(--accent2); padding: 0.15rem 0 0.15rem 1rem; margin: 1rem 0; }
+.analogy b { color: var(--accent2); }
+.math { font-family: var(--font-mono); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 0.7rem 1rem; margin: 1rem 0; overflow-x: auto; font-size: 0.93rem; }
+
+.tag-orig, .tag-deep { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em; padding: 0.05rem 0.45rem; border-radius: 4px; white-space: nowrap; }
+.tag-orig { color: var(--fg-dim); border: 1px solid var(--line); background: var(--panel); }
+.tag-deep { color: var(--accent2); border: 1px solid var(--accent2); background: var(--accent2-soft); }
+aside.orig { margin: 1.4rem 0; display: grid; gap: 0.5rem; }
+aside.orig blockquote { margin: 0; padding: 0.15rem 0 0.15rem 1rem; border-left: 2px solid var(--line); font-family: var(--font-body); font-size: 0.93rem; line-height: 1.65; color: var(--fg-dim); }
+.deep { margin: 1.4rem 0; padding: 1rem 1.2rem; border: 1px solid var(--line); border-top: 3px solid var(--accent2); border-radius: 8px; background: var(--panel); min-width: 0; }
+.deep h4 { font-size: 1rem; margin: 1.1rem 0 0.2rem; color: var(--accent2); }
+.deep h4:first-of-type { margin-top: 0.7rem; }
+.deep p, .deep li { font-size: 0.95rem; }
+mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 0.2rem 0; }
+
+figure { margin: 1.4rem 0; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 1rem; }
+figure img { display: block; width: 100%; height: auto; border-radius: 4px; background: #fff; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption { font-size: 0.86rem; color: var(--fg-dim); margin-top: 0.6rem; line-height: 1.65; }
+svg text { font-family: var(--font-body); font-size: 12px; }
+
+.tbl { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.78rem; color: var(--fg-dim); letter-spacing: 0.03em; white-space: nowrap; font-weight: 600; }
+tr:last-child td { border-bottom: none; }
+td.n { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel-2); }
+.seg button { font: inherit; font-size: 0.85rem; padding: 0.3rem 0.8rem; border: 0; background: transparent; color: var(--fg-dim); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent2); color: #fff; }
+.ctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; margin-top: 0.8rem; font-size: 0.9rem; }
+.ctrl label { color: var(--fg-dim); }
+.ctrl input[type=range] { flex: 1 1 10rem; accent-color: var(--accent); }
+.demo { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 1.2rem; align-items: start; }
+.demo canvas { width: 100%; max-width: 260px; aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--line); background: #2a2a33; display: block; }
+.metrics { display: grid; gap: 0.5rem; }
+.metrics table td, .metrics table th { padding: 0.35rem 0.55rem; }
+.verdict { font-size: 0.88rem; color: var(--fg-dim); }
+@media (max-width: 600px) { .demo { grid-template-columns: minmax(0, 1fr); } .demo canvas { margin: 0 auto; } }
+
+.ex { background: var(--panel); border: 1px dashed var(--line); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 0.8rem 0; }
+details summary { cursor: pointer; color: var(--accent); font-size: 0.9rem; margin-top: 0.4rem; }
+dl.gloss { display: grid; grid-template-columns: minmax(7rem, max-content) 1fr; gap: 0.45rem 1rem; margin: 1rem 0; }
+dl.gloss dt { font-weight: 700; }
+dl.gloss dt small { display: block; font-family: var(--font-mono); font-weight: 400; color: var(--fg-dim); font-size: 0.74rem; }
+dl.gloss dd { margin: 0; min-width: 0; }
+@media (max-width: 480px) { dl.gloss { grid-template-columns: 1fr; } dl.gloss dd { margin-bottom: 0.6rem; } }
+ol.plain { padding-left: 1.4rem; margin: 0.6rem 0; }
+footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: 0.82rem; color: var(--fg-dim); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">&gt; paper tutorial · MLCN 2026 @ MICCAI</div>
+  <h1 style="margin-top:.4rem">CNN 學到了什麼？<br>腦腫瘤分類模型的三層檢查</h1>
+  <p class="lede">給只修過基礎微積分和統計的讀者：一個準確率 96% 的腦腫瘤分類器，裡面到底學到了什麼，以及我們怎麼檢查它。</p>
+  <p class="meta">論文：<i>Do CNNs Learn Clinically Meaningful Imaging Representations? A Portable Multi-level Representation Audit for Brain Tumor MRI Classification</i><br>作者：賴鉑崴、陳麗芬　·　MICCAI 2026 Workshop on Machine Learning in Clinical Neuroimaging (MLCN)　·　預計閱讀 45–60 分鐘</p>
+  <div class="links">
+    <a class="plink" href="https://papers.miccai.org/miccai-2026-sat/paper/MLCN_2026_035.pdf" target="_blank" rel="noopener">[paper]</a>
+    <a class="plink" href="https://youtu.be/EiSosUWZuGY" target="_blank" rel="noopener">[1-min talk]</a>
+    <a class="plink" href="https://github.com/s9988766-creator/MLCN-MICCAI2026-brain-tumor-audit" target="_blank" rel="noopener">[project]</a>
+  </div>
+  <ul class="toc">
+    <li><a href="#l1">1 為什麼準確率不夠</a></li>
+    <li><a href="#l2">2 資料洩漏</a></li>
+    <li><a href="#l3">3 CNN 的特徵向量</a></li>
+    <li><a href="#l4">4 模組 I：分群</a></li>
+    <li><a href="#l5">5 模組 II：radiomics 對應</a></li>
+    <li><a href="#l6">6 模組 III：注意力在哪</a></li>
+    <li><a href="#results">結果總整理</a></li>
+    <li><a href="#limits">這篇沒有證明什麼</a></li>
+    <li><a href="#gloss">術語表</a></li>
+  </ul>
+  <div class="thesis"><b>一句話版本：</b>模型分類分得準，不代表它看的是腫瘤本身。我們不重新訓練模型，而是從三個角度檢查它：特徵空間有沒有依診斷分開、特徵是否對應到放射科常用的影像描述子、注意力有沒有落在腫瘤上。結果發現<b class="m">腦膜瘤</b>和<b class="p">腦下垂體瘤</b>的注意力穩定落在腫瘤上，但<b class="g">神經膠質瘤</b>的注意力很分散。</div>
+  <p class="legend">標著 <span class="tag-orig">原文</span> 的區塊是論文裡對應的英文句子；標著 <span class="tag-deep">進階</span> 的區塊有公式，第一次讀可以先跳過。</p>
+</header>
+
+<section id="l1">
+  <h2><span class="lesson">lesson 1</span>為什麼「準確率很高」還不夠</h2>
+  <p>這篇用的資料是常見的腦腫瘤 MRI 資料集（Cheng/Figshare）：233 位病人、3,062 張打了顯影劑的 T1 橫切面影像，每張都標了腫瘤的輪廓，分成三類：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>腫瘤類型</th><th>張數</th><th>影像上大致的樣子</th></tr></thead>
+    <tbody>
+      <tr><td class="g">神經膠質瘤 glioma</td><td class="n">1,426</td><td>長在腦組織裡，常往周圍浸潤，邊界不清楚</td></tr>
+      <tr><td class="m">腦膜瘤 meningioma</td><td class="n">706</td><td>長在腦膜上，邊界清楚，常貼著顱骨內側</td></tr>
+      <tr><td class="p">腦下垂體瘤 pituitary</td><td class="n">930</td><td>位置固定在腦下垂體附近，形狀較規則</td></tr>
+    </tbody>
+  </table></div>
+  <p>在這個資料集上，深度學習的準確率早就超過 97%。再多 1、2 個百分點，科學和臨床上的意義都很有限。真正的問題變成：<b>模型是靠「看腫瘤」答對的，還是靠別的線索？</b></p>
+  <div class="analogy"><b>捷徑學習（shortcut learning）的例子：</b>有研究發現，判斷胸部 X 光是否為 COVID-19 的模型，其實學到的是不同醫院機器的標記、病人擺位等線索，而不是肺部病灶。換一家醫院的資料，準確率就崩掉了。準確率高，不代表模型看對地方。</div>
+  <p>所以這篇論文不提出更準的模型，而是提出一套<b>檢查方法</b>（audit，審查），用來看一個已經訓練好的模型內部學到了什麼。它有三個特點：</p>
+  <ol class="plain">
+    <li><b>不需要重新訓練</b>：拿現成的模型就能檢查。</li>
+    <li><b>不限定模型架構</b>（model-agnostic）：只要能取出特徵向量和注意力圖就能用。</li>
+    <li><b>全部用定量指標</b>：不是看幾張熱圖說「看起來不錯」，而是算出數字。</li>
+  </ol>
+  <aside class="orig"><span class="tag-orig">原文 · §1 Introduction</span>
+    <blockquote lang="en">As accuracy saturates, gains of one or two points carry diminishing scientific and clinical value. The key question is no longer how accurately CNNs classify tumors, but whether they learn clinically meaningful representations that can support trustworthy deployment.</blockquote>
+  </aside>
+</section>
+
+<section id="l2">
+  <h2><span class="lesson">lesson 2</span>資料洩漏：同一位病人不能同時在考卷和課本裡</h2>
+  <p>每位病人平均有十幾張相鄰的切片，彼此幾乎一模一樣。如果隨機把<b>切片</b>分到訓練集和測試集，同一位病人的切片就會兩邊都有。模型等於考前看過考題，分數會被灌水。這叫<b>資料洩漏</b>（data leakage）。</p>
+  <p>麻煩的是，網路上常用的 Roboflow 版本把病人編號弄丟了。我們回頭用檔名對照原始的 <code>.mat</code> 檔，找回每張切片屬於哪位病人，以及原作者官方的 5-fold 分組。比對結果與官方類別標記的一致率是 99.97%，而且沒有任何病人跨越兩個 fold。</p>
+  <figure>
+    <svg viewBox="0 0 640 230" role="img" aria-label="三種切分方式的準確率：切片層級隨機切分 99.0%，病人層級單次切分驗證 97.2% 但測試 92.2%，病人層級五折交叉驗證 96.46%">
+      <g id="leakbars"></g>
+    </svg>
+    <figcaption>同一個 ResNet-50，只改變資料怎麼切。切片層級的隨機切分因為洩漏得到 99.0%；病人層級但只切一次，光是哪些病人被分到測試組，就讓結果在 97.2% 和 92.2% 之間擺盪 5 個百分點；病人層級 5-fold 交叉驗證給出最穩定的估計。</figcaption>
+  </figure>
+  <p>所以全篇的模型訓練與檢查，都使用<b>病人層級的 5-fold 交叉驗證</b>：每次用 4 組病人訓練，在第 5 組上測試，輪流 5 次。</p>
+  <aside class="orig"><span class="tag-orig">原文 · §3.1</span>
+    <blockquote lang="en">Evaluation protocol strongly affected the estimate: a patient-disjoint single split gave 97.2% validation but only 92.2% test (a ~5-point swing from patient assignment alone), and a random slice-level split inflated accuracy to 99.0% through patient leakage.</blockquote>
+  </aside>
+</section>
+
+<section id="l3">
+  <h2><span class="lesson">lesson 3</span>CNN 的特徵向量：模型「看完一張圖」後的筆記</h2>
+  <p>模型是在 ImageNet 上預訓練過的 ResNet-50，全部層都微調。輸入前先把腫瘤周圍裁成 3×3 的框，腫瘤在正中間、四周保留一圈組織。實驗發現只裁腫瘤本身準確率會下降，代表周圍組織也有資訊。</p>
+  <p>ResNet-50 最後一層分類器之前，會把整張圖壓縮成一個 <b>2,048 維的向量</b>（global average pooling 層的輸出）。可以把它想成模型看完這張圖後寫下的 2,048 個數字的筆記，分類器只根據這份筆記做判斷。<b>這篇檢查的就是這份筆記。</b></p>
+  <p>我們做了兩份筆記來比較：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>特徵</th><th>來源</th><th>用途</th></tr></thead>
+    <tbody>
+      <tr><td>預訓練特徵</td><td>只在 ImageNet 學過、沒看過腦腫瘤的 ResNet-50</td><td>對照組：「還沒學」的樣子</td></tr>
+      <tr><td><b>Out-of-fold 特徵</b></td><td>微調後的模型，而且每張圖都由「沒看過這位病人」的那個 fold 模型來算</td><td>檢查主角：「學完」的樣子，而且沒有洩漏</td></tr>
+    </tbody>
+  </table></div>
+  <div class="analogy"><b>為什麼要 out-of-fold：</b>如果用訓練時看過的圖來檢查，模型可能只是背下了這些圖。每張圖都交給沒看過它的模型處理，檢查的才是模型「學會」的東西。</div>
+  <p>這樣訓練出來的模型，5-fold 平均準確率是 <span class="num">96.46 ± 1.39%</span>。同樣的切分下，用 19 個手工 radiomics 特徵加上傳統分類器，最好只有 <span class="num">86.47%</span>，差了大約 10 個百分點。</p>
+</section>
+
+<section id="l4">
+  <h2><span class="lesson">lesson 4</span>模組 I：不告訴答案，特徵會自己分成三群嗎？</h2>
+  <p>第一個檢查是看特徵空間的<b>形狀</b>。做法：先用 PCA 把 2,048 維壓到保留 95% 變異量，再用 k-means 分成 3 群（<b>不給它任何標籤</b>），最後看分出來的 3 群跟真正的 3 種腫瘤吻合多少。</p>
+  <p>吻合程度用 <b>ARI</b>（Adjusted Rand Index）衡量：1 代表分群跟真實類別完全一樣，0 代表跟亂分差不多。</p>
+  <figure>
+    <div class="seg" role="group" aria-label="選擇特徵空間">
+      <button type="button" data-space="pre" aria-pressed="true">預訓練 CNN</button>
+      <button type="button" data-space="ft" aria-pressed="false">微調後 CNN</button>
+    </div>
+    <svg id="scatter" viewBox="0 0 640 300" role="img" aria-label="示意圖：預訓練特徵的三類點混在一起，微調後特徵的三類點分成三群" style="margin-top:.7rem"></svg>
+    <figcaption><b>示意圖，不是真實資料。</b>每個點是一張影像，顏色是真正的腫瘤類別：<span class="g">● 膠質瘤</span>　<span class="m">● 腦膜瘤</span>　<span class="p">● 垂體瘤</span>。圖下的 ARI 是論文實際量到的數值。</figcaption>
+  </figure>
+  <div class="tbl"><table>
+    <thead><tr><th>特徵空間</th><th>ARI</th><th>NMI</th></tr></thead>
+    <tbody>
+      <tr><td>手工 radiomics（19 個描述子）</td><td class="n">0.256</td><td class="n">—</td></tr>
+      <tr><td>預訓練 CNN</td><td class="n">0.260</td><td class="n">—</td></tr>
+      <tr><td><b>微調後 CNN</b></td><td class="n"><b>0.904 ± 0.036</b></td><td class="n">0.845 ± 0.050</td></tr>
+    </tbody>
+  </table></div>
+  <p>有一個有趣的對比：radiomics 特徵在有監督的分類下可以做到 86%，可是不給標籤分群時幾乎分不開（ARI 0.256）。代表在手工特徵的空間裡，「診斷」不是最主要的結構，需要分類器畫出界線才分得出來。微調之後，診斷才變成 CNN 特徵空間裡最主要的結構。</p>
+  <div class="analogy"><b>要誠實看待這個結果：</b>模型就是用這三個類別訓練的，所以特徵依類別分開本來就是預期中的事。ARI 高只是描述「特徵空間長什麼樣子」，<b>不能</b>當成「模型學到臨床意義」的證據。</div>
+  <div class="deep"><span class="tag-deep">進階</span>
+    <h4>ARI 在算什麼</h4>
+    <p>Rand Index 看所有「兩張圖一組」的配對：如果兩張圖在真實類別裡同類、在分群結果裡也同群，或兩邊都不同，就算一致。一致的配對比例就是 RI。但隨便亂分也會有一定比例的一致，所以 ARI 扣掉亂分的期望值再重新縮放：</p>
+    \[\mathrm{ARI}=\frac{\mathrm{RI}-\mathbb{E}[\mathrm{RI}]}{\max(\mathrm{RI})-\mathbb{E}[\mathrm{RI}]}.\]
+    <p>亂分的期望 ARI 是 0，完全吻合是 1，比亂分還差時可以是負的。</p>
+    <h4>為什麼要先做 PCA</h4>
+    <p>k-means 用歐氏距離。在 2,048 維空間裡，很多維度只是雜訊，會把距離「稀釋」掉。PCA 先找出變異最大的方向，保留 95% 的變異量，讓距離主要反映有意義的差異。每個 fold 的特徵空間是獨立訓練出來的，所以分群在每個 fold 內各做一次，再平均。</p>
+  </div>
+</section>
+
+<section id="l5">
+  <h2><span class="lesson">lesson 5</span>模組 II：特徵對得上放射科看的東西嗎？</h2>
+  <p>第二個檢查問的是：2,048 個數字裡，有沒有哪些跟醫師判讀時會看的影像性質有關？我們用 <b>radiomics</b>（影像組學）描述子當作那些性質的量化版本，分成三類：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>類別</th><th>數量</th><th>量什麼</th></tr></thead>
+    <tbody>
+      <tr><td>強度 intensity</td><td class="n">9</td><td>腫瘤內亮度的平均、分布、偏態等（顯影劑讓腫瘤變亮的程度）</td></tr>
+      <tr><td>形狀 shape</td><td class="n">6</td><td>面積、周長、圓度、長寬比等</td></tr>
+      <tr><td>紋理 texture</td><td class="n">4</td><td>GLCM 對比度、均勻度等，描述內部是否斑駁</td></tr>
+    </tbody>
+  </table></div>
+  <p>原本抽了 38 個，去掉幾乎不變的、以及彼此高度相關（|r| &gt; 0.9）的，剩下 19 個。</p>
+  <p><b>怎麼算「對得上」：</b>對 2,048 個維度裡的每一維，跟 19 個描述子各算一次 <b>Spearman 相關係數</b>，取絕對值最大的那個，當作這一維的「對應分數」。然後看有多少比例的維度對應分數超過 0.5，記為 \(\rho_{0.5}\)。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>描述子類別</th><th>預訓練 \(\rho_{0.5}\)</th><th>微調後 \(\rho_{0.5}\)</th><th>預訓練中位數</th><th>微調後中位數</th></tr></thead>
+    <tbody>
+      <tr><td>強度（9）</td><td class="n">0.4%</td><td class="n"><b>19.5%</b></td><td class="n">0.197</td><td class="n">0.346</td></tr>
+      <tr><td>紋理（4）</td><td class="n">0.9%</td><td class="n">6.3%</td><td class="n">0.184</td><td class="n">0.309</td></tr>
+      <tr><td>形狀（6）</td><td class="n">5.3%</td><td class="n">3.1%</td><td class="n">0.197</td><td class="n">0.241</td></tr>
+      <tr><td><b>全部（19）</b></td><td class="n">5.6%</td><td class="n"><b>24.5%</b></td><td class="n">0.22</td><td class="n">0.40</td></tr>
+    </tbody>
+  </table></div>
+  <p>讀法：微調後，強烈對應到某個描述子的維度從 5.6% 增加到 24.5%，大約 <b>4 倍</b>。而且主角換人了：微調前對應最多的是<b>形狀</b>，微調後變成<b>強度</b>。這跟 MRI 的物理原理一致：打了顯影劑的 T1 影像，腫瘤類型主要靠血腦障壁破壞後的亮度差異來區分。</p>
+  <div class="analogy"><b>同樣要誠實：</b>CNN 特徵和 radiomics 描述子都跟診斷有關，所以兩者相關性變高，可能只是因為兩邊都「跟類別有關」，不一定代表 CNN 真的學到了那個影像性質。這個結果是「一致」，不是「證明」。</div>
+  <aside class="orig"><span class="tag-orig">原文 · §3.3</span>
+    <blockquote lang="en">Fine-tuning strengthened representation–radiomic correspondence: ρ₀.₅ rose from 5.6 ± 1.7% to 24.5 ± 6.5% and the median alignment from 0.22 to 0.40, indicating that radiomic-correlated structure became more prevalent across the space.</blockquote>
+  </aside>
+  <div class="deep"><span class="tag-deep">進階</span>
+    <h4>Spearman 相關係數</h4>
+    <p>把兩組數字各自換成排名，再算排名之間的 Pearson 相關。沒有同分時可以寫成</p>
+    \[\rho=1-\frac{6\sum_{k=1}^{n} d_k^2}{n(n^2-1)},\qquad d_k=\text{第 }k\text{ 張圖在兩邊的排名差}.\]
+    <p>它只在乎「一個變大時另一個是否也變大」，不要求直線關係，對極端值也比較不敏感。</p>
+    <h4>對應分數與選擇偏誤</h4>
+    <p>設 \(M_{ij}\) 是第 \(i\) 個 CNN 維度與第 \(j\) 個描述子的 Spearman 相關，對應分數定義為</p>
+    \[p_i=\max_j\,|M_{ij}|,\qquad \rho_{0.5}=\frac{1}{2048}\,\#\{i: p_i&gt;0.5\}.\]
+    <p>從 19 個裡挑最大的，本身就會讓數字偏高：就算兩邊完全無關，19 個相關係數裡的最大值也不會是 0。所以論文只比較「微調前 vs 微調後」的相對變化，不把 \(p_i\) 當成絕對的效果量。更嚴謹的做法是打亂配對做置換檢定（permutation null），論文把它列為未來工作。</p>
+  </div>
+</section>
+
+<section id="l6">
+  <h2><span class="lesson">lesson 6</span>模組 III：模型的注意力落在腫瘤上嗎？</h2>
+  <p>第三個檢查用 <b>Grad-CAM</b> 畫出模型做判斷時「最在意」的區域，再跟醫師標的腫瘤輪廓比。把熱圖在門檻 τ = 0.5 切開，得到注意力區域 A；腫瘤遮罩是 M。三個指標：</p>
+  <div class="math">IoU = |A ∩ M| ÷ |A ∪ M|　　兩者重疊多少<br>coverage = |A ∩ M| ÷ |M|　　腫瘤有多少被注意到<br>specificity = |A ∩ M| ÷ |A|　　注意力有多少落在腫瘤上</div>
+  <p>但這裡有個陷阱：<b>輸入時腫瘤永遠被放在正中間</b>。一個只會盯著畫面中心的模型，指標也會很好看。下面可以自己試試看：</p>
+  <figure>
+    <div class="demo">
+      <canvas id="cam" width="260" height="260" role="img" aria-label="模擬的 Grad-CAM 熱圖與腫瘤輪廓"></canvas>
+      <div class="metrics">
+        <div class="seg" role="group" aria-label="顯示哪個模型">
+          <button type="button" data-model="track" aria-pressed="true">跟著腫瘤的模型</button>
+          <button type="button" data-model="center" aria-pressed="false">只看中心的模型</button>
+        </div>
+        <div class="ctrl"><label for="shift">腫瘤位置</label><input id="shift" type="range" min="0" max="1" step="0.01" value="0"><span class="num" id="shiftv">正中間</span></div>
+        <div class="ctrl"><label for="tau">門檻 τ</label><input id="tau" type="range" min="0.3" max="0.7" step="0.05" value="0.5"><span class="num" id="tauv">0.50</span></div>
+        <div class="tbl" style="margin:.3rem 0 0"><table>
+          <thead><tr><th></th><th>IoU</th><th>coverage</th><th>specificity</th></tr></thead>
+          <tbody>
+            <tr><td>跟著腫瘤</td><td class="n" id="t-iou"></td><td class="n" id="t-cov"></td><td class="n" id="t-spe"></td></tr>
+            <tr><td>只看中心</td><td class="n" id="c-iou"></td><td class="n" id="c-cov"></td><td class="n" id="c-spe"></td></tr>
+          </tbody>
+        </table></div>
+        <p class="verdict" id="verdict"></p>
+      </div>
+    </div>
+    <figcaption><b>示意模擬，不是真實模型。</b>紅色圈是腫瘤，橘色是超過門檻的注意力。腫瘤在正中間時，兩個模型的分數一模一樣；把腫瘤往角落移，才看得出誰真的在看腫瘤。</figcaption>
+  </figure>
+  <p>所以論文加了三個對照實驗，排除「只是看中心」的可能：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>對照</th><th>做法</th><th>結果</th></tr></thead>
+    <tbody>
+      <tr><td>1. 跟沒學過的模型比</td><td>預訓練與微調模型看<b>完全相同</b>的置中影像，差異只能來自學習</td><td>specificity <span class="num">0.608</span> vs <span class="num">0.176</span>，約 3.5 倍</td></tr>
+      <tr><td>2. 跟「中心圓盤」比</td><td>用一個固定在中心、面積相同的圓盤當作「只看中心」的基準</td><td>腦膜瘤 <span class="num">0.851</span> 勝過圓盤 <span class="num">0.726</span>：腦膜瘤常偏離中心貼著顱骨，注意力有跟上</td></tr>
+      <tr><td>3. 把腫瘤移到角落</td><td>重新裁切，讓腫瘤落在四個角落之一，<b>不重新訓練</b></td><td>準確率仍有 <span class="num">85.6%</span>；注意力中心跟著腫瘤移動（x / y 相關 0.61 / 0.68）</td></tr>
+    </tbody>
+  </table></div>
+  <figure>
+    <img src="../../img/mlcn.jpg" alt="論文圖一：腫瘤被裁到左上角後，Grad-CAM 熱圖跟著腫瘤移動" loading="lazy">
+    <figcaption>論文 Fig. 1。上排：腫瘤被重新裁切到左上角（紅色輪廓）。下排：Grad-CAM 熱圖跟著腫瘤移動，沒有停在畫面中心。</figcaption>
+  </figure>
+  <h3>三種腫瘤的差別</h3>
+  <p>把注意力再拆成三份：落在<b>腫瘤內</b>、<b>腫瘤周圍一圈</b>（寬度隨腫瘤大小調整）、<b>其他背景</b>，三者加起來是 1。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>類別</th><th>腫瘤內</th><th>周圍</th><th>背景</th><th>移到角落後：腫瘤＋周圍</th></tr></thead>
+    <tbody>
+      <tr><td class="m">腦膜瘤</td><td class="n">0.851</td><td class="n">0.144</td><td class="n">0.005</td><td class="n">0.730</td></tr>
+      <tr><td class="p">垂體瘤</td><td class="n">0.728</td><td class="n">0.267</td><td class="n">0.006</td><td class="n">0.722</td></tr>
+      <tr><td class="g">膠質瘤</td><td class="n">0.409</td><td class="n">0.428</td><td class="n">0.163</td><td class="n">0.444</td></tr>
+    </tbody>
+  </table></div>
+  <p>邊界清楚的<b class="m">腦膜瘤</b>和<b class="p">垂體瘤</b>，注意力幾乎都在腫瘤上，移到角落也跟得上。<b class="g">膠質瘤</b>的注意力則有一大半在腫瘤外面，移到角落後只剩 44% 在腫瘤附近。可能的解釋之一是膠質瘤會往周圍浸潤，真正的病灶範圍本來就比標註的輪廓大；但腫瘤大小與位置、標註品質、Grad-CAM 本身解析度不高，也都可能造成這個現象。</p>
+  <aside class="orig"><span class="tag-orig">原文 · §3.4</span>
+    <blockquote lang="en">Across the three controls, attention for meningioma and pituitary tumors fell mostly inside the tumor polygon, which supports the semantic result in Section 3.3. In contrast, glioma attention remains diffuse, a pattern compatible with infiltrative growth but not uniquely explained by it.</blockquote>
+  </aside>
+  <div class="deep"><span class="tag-deep">進階</span>
+    <h4>Grad-CAM 怎麼算</h4>
+    <p>取最後一個卷積區塊的特徵圖 \(A^k\)（第 \(k\) 個通道）。對預測類別的分數 \(y^c\) 求梯度，在空間上平均得到每個通道的權重，再加權相加、只留正值：</p>
+    \[\alpha_k^c=\frac{1}{Z}\sum_{i,j}\frac{\partial y^c}{\partial A^k_{ij}},\qquad L^c=\mathrm{ReLU}\Big(\sum_k\alpha_k^c A^k\Big).\]
+    <p>ResNet-50 最後一層的特徵圖只有 7×7，放大到 224×224 後細節有限，這也是膠質瘤結果不能只用「浸潤」解釋的原因之一。</p>
+    <h4>三個指標的關係</h4>
+    <p>coverage 和 specificity 分母不同：注意力很大一片時 coverage 高、specificity 低；注意力只點在腫瘤中心一小塊時則相反。IoU 同時懲罰兩種錯誤：</p>
+    \[\frac{1}{\mathrm{IoU}}=\frac{1}{\text{coverage}}+\frac{1}{\text{specificity}}-1 .\]
+    <p>（由 \(|A\cup M|=|A|+|M|-|A\cap M|\) 兩邊同除以 \(|A\cap M|\) 得到。）</p>
+  </div>
+</section>
+
+<section id="results">
+  <h2><span class="lesson">summary</span>結果總整理</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>檢查</th><th>問的問題</th><th>微調前 → 微調後</th></tr></thead>
+    <tbody>
+      <tr><td>分類</td><td>分得準嗎？</td><td class="n">radiomics 86.47% → CNN 96.46%</td></tr>
+      <tr><td>模組 I</td><td>特徵依診斷分群嗎？</td><td class="n">ARI 0.260 → 0.904</td></tr>
+      <tr><td>模組 II</td><td>特徵對得上 radiomics 嗎？</td><td class="n">ρ₀.₅ 5.6% → 24.5%</td></tr>
+      <tr><td>模組 III</td><td>注意力在腫瘤上嗎？</td><td class="n">specificity 0.176 → 0.608</td></tr>
+    </tbody>
+  </table></div>
+  <p>三個檢查從不同角度指向同一件事：微調讓模型的內部表徵變得更有結構、更接近放射科看的影像性質，而且對腦膜瘤和垂體瘤來說，注意力確實落在腫瘤上。但對膠質瘤，<b>準確率高（F1 0.978）卻不代表注意力集中在腫瘤上</b>，這正是只看準確率會漏掉的地方。</p>
+</section>
+
+<section id="limits">
+  <h2><span class="lesson">limitations</span>這篇沒有證明什麼</h2>
+  <p>論文刻意把結論寫得保守。讀的時候要分清楚「發現」和「證明」：</p>
+  <ul>
+    <li><b>沒有證明模型「有臨床意義」。</b>三個檢查都是間接證據：分群和相關性部分來自用同樣的類別訓練，radiomics 描述子也只是臨床概念的粗略代理。</li>
+    <li><b>Grad-CAM 是相關，不是因果。</b>它告訴你模型跟哪裡「有關」，不代表遮掉那裡模型就會答錯。</li>
+    <li><b>描述子篩選用到了全部資料。</b>篩選只看特徵本身的變異和彼此相關，沒有用到診斷標籤，但測試 fold 也參與了估計，可能讓 radiomics 基準稍微樂觀。</li>
+    <li><b>只用了一個資料集、一種 MRI 序列、一個模型架構。</b>換一家醫院、換一種模型，結論不一定成立。</li>
+  </ul>
+  <p>把限制寫清楚不是示弱，而是讓讀者知道結果可以相信到什麼程度。</p>
+</section>
+
+<section id="gloss">
+  <h2><span class="lesson">glossary</span>術語表</h2>
+  <dl class="gloss">
+    <dt>表徵<small>representation</small></dt><dd>模型內部用來描述一張圖的數字，這裡指 2,048 維的特徵向量。</dd>
+    <dt>審查<small>audit</small></dt><dd>不改模型，從外部系統性地檢查它學到了什麼。</dd>
+    <dt>捷徑學習<small>shortcut learning</small></dt><dd>模型靠與答案碰巧相關、但無關病灶的線索答對。</dd>
+    <dt>資料洩漏<small>data leakage</small></dt><dd>測試資料的資訊混進訓練資料，讓成績被高估。</dd>
+    <dt>交叉驗證<small>k-fold cross-validation</small></dt><dd>把資料分成 k 組，輪流拿一組當測試、其他當訓練。</dd>
+    <dt>Out-of-fold<small>OOF</small></dt><dd>每筆資料都由沒訓練過它的模型來處理。</dd>
+    <dt>PCA<small>principal component analysis</small></dt><dd>找出資料變異最大的方向，用較少維度表示資料。</dd>
+    <dt>ARI<small>adjusted Rand index</small></dt><dd>分群結果與真實類別的吻合度，扣掉亂分的期望值。</dd>
+    <dt>Radiomics<small>影像組學</small></dt><dd>從醫學影像算出的手工定量特徵，例如亮度、形狀、紋理。</dd>
+    <dt>Spearman 相關<small>Spearman ρ</small></dt><dd>用排名算的相關係數，只看兩者是否一起變大變小。</dd>
+    <dt>Grad-CAM</dt><dd>用梯度找出模型做判斷時最依賴的影像區域，畫成熱圖。</dd>
+    <dt>Specificity<small>本文定義</small></dt><dd>注意力區域中，落在腫瘤內的比例。</dd>
+  </dl>
+</section>
+
+<footer>
+  © 2026 賴鉑崴 · 本導讀依據已發表的論文撰寫，數字與完整細節以<a href="https://papers.miccai.org/miccai-2026-sat/paper/MLCN_2026_035.pdf" target="_blank" rel="noopener">論文原文</a>為準。 · <a href="https://s9988766-creator.github.io">回到首頁</a>
+</footer>
+</div>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(t, a, txt) { var e = document.createElementNS(NS, t); for (var k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; return e; }
+  var css = getComputedStyle(document.documentElement);
+  function c(v) { return css.getPropertyValue(v).trim(); }
+
+  /* ---- leakage bars ---- */
+  var g = document.getElementById('leakbars');
+  var rows = [
+    { label: '切片層級隨機切分（有洩漏）', v: 99.0, txt: '99.0%', col: c('--tumor') },
+    { label: '病人層級單次切分：驗證', v: 97.2, txt: '97.2%', col: c('--fg-dim') },
+    { label: '病人層級單次切分：測試', v: 92.2, txt: '92.2%', col: c('--fg-dim') },
+    { label: '病人層級 5-fold（本文）', v: 96.46, txt: '96.46 ± 1.39%', col: c('--accent2') }
+  ];
+  var X0 = 200, X1 = 500, lo = 85, hi = 100;
+  function sx(v) { return X0 + (v - lo) / (hi - lo) * (X1 - X0); }
+  [85, 90, 95, 100].forEach(function (t) {
+    g.appendChild(el('line', { x1: sx(t), x2: sx(t), y1: 14, y2: 196, stroke: c('--line'), 'stroke-width': 1 }));
+    g.appendChild(el('text', { x: sx(t), y: 214, 'text-anchor': 'middle', fill: c('--fg-dim') }, t + '%'));
+  });
+  rows.forEach(function (r, i) {
+    var y = 22 + i * 44;
+    g.appendChild(el('text', { x: X0 - 10, y: y + 17, 'text-anchor': 'end', fill: c('--fg') }, r.label));
+    g.appendChild(el('rect', { x: X0, y: y, width: sx(r.v) - X0, height: 26, rx: 3, fill: r.col, 'fill-opacity': 0.85 }));
+    g.appendChild(el('text', { x: Math.min(sx(r.v) + 6, 512), y: y + 17, fill: c('--fg'), 'font-family': 'JetBrains Mono, monospace', 'text-anchor': 'start' }, r.txt));
+  });
+
+  /* ---- clustering schematic ---- */
+  var svg = document.getElementById('scatter');
+  var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+  function gauss() { var u = rnd() || 1e-9, v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+  var cls = [{ col: c('--glioma'), n: 46 }, { col: c('--mening'), n: 24 }, { col: c('--pit'), n: 30 }];
+  var centersFt = [[180, 150], [440, 90], [430, 220]];
+  var pts = [];
+  cls.forEach(function (k, ci) {
+    for (var i = 0; i < k.n; i++) {
+      pts.push({ ci: ci, pre: [320 + gauss() * 95, 150 + gauss() * 55], ft: [centersFt[ci][0] + gauss() * 38, centersFt[ci][1] + gauss() * 26] });
+    }
+  });
+  function drawScatter(space) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    svg.appendChild(el('rect', { x: 20, y: 10, width: 600, height: 262, rx: 6, fill: '#fff', 'fill-opacity': 0.5, stroke: c('--line') }));
+    pts.forEach(function (p) {
+      var q = p[space];
+      var x = Math.max(28, Math.min(612, q[0])), y = Math.max(18, Math.min(264, q[1]));
+      svg.appendChild(el('circle', { cx: x, cy: y, r: 4.2, fill: cls[p.ci].col, 'fill-opacity': 0.8 }));
+    });
+    var ari = space === 'pre' ? 'ARI = 0.260（預訓練，論文實測）' : 'ARI = 0.904（微調後，論文實測）';
+    svg.appendChild(el('text', { x: 320, y: 292, 'text-anchor': 'middle', fill: c('--fg'), 'font-weight': 600 }, ari));
+  }
+  var segBtns = document.querySelectorAll('[data-space]');
+  segBtns.forEach(function (b) { b.addEventListener('click', function () { segBtns.forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); }); drawScatter(b.dataset.space); }); });
+  drawScatter('pre');
+
+  /* ---- Grad-CAM simulation ---- */
+  var canvas = document.getElementById('cam'), ctx = canvas.getContext('2d');
+  var N = 56, R = 6.5, model = 'track';
+  var shiftEl = document.getElementById('shift'), tauEl = document.getElementById('tau');
+  var noise = []; seed = 11; for (var i = 0; i < N * N; i++) noise.push(rnd());
+  function tumorPos(s) { var c0 = N / 2, corner = 0.22 * N; return [c0 + (corner - c0) * s, c0 + (corner - c0) * s]; }
+  function attention(kind, tp) {
+    var cx = kind === 'track' ? tp[0] : N / 2, cy = kind === 'track' ? tp[1] : N / 2, sig = R * 1.15, a = new Float32Array(N * N), mx = 0;
+    for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
+      var d2 = (x + 0.5 - cx) * (x + 0.5 - cx) + (y + 0.5 - cy) * (y + 0.5 - cy);
+      var v = Math.exp(-d2 / (2 * sig * sig)); a[y * N + x] = v; if (v > mx) mx = v;
+    }
+    for (var k = 0; k < a.length; k++) a[k] /= mx;
+    return a;
+  }
+  function metrics(att, tp, tau) {
+    var A = 0, M = 0, I = 0;
+    for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
+      var inM = ((x + 0.5 - tp[0]) * (x + 0.5 - tp[0]) + (y + 0.5 - tp[1]) * (y + 0.5 - tp[1])) <= R * R;
+      var inA = att[y * N + x] >= tau;
+      if (inA) A++; if (inM) M++; if (inA && inM) I++;
+    }
+    return { iou: I / (A + M - I), cov: I / M, spe: A ? I / A : 0 };
+  }
+  function fmt(v) { return v.toFixed(2); }
+  function draw() {
+    var s = parseFloat(shiftEl.value), tau = parseFloat(tauEl.value), tp = tumorPos(s);
+    document.getElementById('shiftv').textContent = s < 0.02 ? '正中間' : s > 0.98 ? '左上角' : '往角落 ' + Math.round(s * 100) + '%';
+    document.getElementById('tauv').textContent = tau.toFixed(2);
+    var at = attention('track', tp), ac = attention('center', tp);
+    var mt = metrics(at, tp, tau), mc = metrics(ac, tp, tau);
+    [['t', mt], ['c', mc]].forEach(function (p) { document.getElementById(p[0] + '-iou').textContent = fmt(p[1].iou); document.getElementById(p[0] + '-cov').textContent = fmt(p[1].cov); document.getElementById(p[0] + '-spe').textContent = fmt(p[1].spe); });
+    var v = document.getElementById('verdict');
+    v.textContent = s < 0.02 ? '腫瘤在正中間：兩個模型的分數完全相同，光看指標分不出來。' : s < 0.35 ? '腫瘤稍微偏離中心：只看中心的模型開始失分。' : '腫瘤在角落：只看中心的模型幾乎完全錯過腫瘤，這就是 shifted-input 對照的用意。';
+    var dpr = window.devicePixelRatio || 1, W = canvas.clientWidth || 260;
+    if (canvas.width !== Math.round(W * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(W * dpr); }
+    var cell = canvas.width / N, att = model === 'track' ? at : ac;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
+      var dx = x + 0.5 - N / 2, dy = y + 0.5 - N / 2, inBrain = dx * dx / (0.46 * N * 0.46 * N) + dy * dy / (0.44 * N * 0.44 * N) < 1;
+      var base = inBrain ? 70 + noise[y * N + x] * 35 : 25 + noise[y * N + x] * 10;
+      var tin = ((x + 0.5 - tp[0]) * (x + 0.5 - tp[0]) + (y + 0.5 - tp[1]) * (y + 0.5 - tp[1])) <= R * R;
+      if (tin) base += 70;
+      ctx.fillStyle = 'rgb(' + base + ',' + base + ',' + (base + 6) + ')';
+      ctx.fillRect(x * cell, y * cell, cell + 0.5, cell + 0.5);
+      var a = att[y * N + x];
+      if (a >= tau) { ctx.fillStyle = 'rgba(232,120,52,' + (0.25 + 0.45 * a) + ')'; ctx.fillRect(x * cell, y * cell, cell + 0.5, cell + 0.5); }
+    }
+    ctx.strokeStyle = '#ff4d55'; ctx.lineWidth = 2 * dpr;
+    ctx.beginPath(); ctx.arc(tp[0] * cell, tp[1] * cell, R * cell, 0, 2 * Math.PI); ctx.stroke();
+  }
+  var mBtns = document.querySelectorAll('[data-model]');
+  mBtns.forEach(function (b) { b.addEventListener('click', function () { model = b.dataset.model; mBtns.forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); }); draw(); }); });
+  shiftEl.addEventListener('input', draw); tauEl.addEventListener('input', draw);
+  window.addEventListener('resize', draw);
+  draw();
+})();
+</script>
+
+</body>
+</html>

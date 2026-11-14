@@ -5,7 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="MLCN 2026 論文中文互動導讀：CNN 學到了什麼？腦腫瘤分類模型的三層檢查。">
 <link rel="icon" type="image/png" href="../../img/avatar.png">
-<style>body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+<style>body{margin:0} img{max-width:100%} [hidden]{display:none!important}
+/* glossary sidebar: sticky left column on wide screens, end of page on narrow ones */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); }
+.side { order: 2; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 3rem; }
+.side-inner { max-width: 47rem; margin: 0 auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.1rem; }
+.side-label { font-family: var(--font-pixel); font-size: 0.78rem; color: var(--accent); letter-spacing: 0.06em; }
+.side-label::before { content: "// "; }
+.side-title { font-size: 1.15rem; color: var(--accent2); margin: 0.1rem 0 0.6rem; border: 0; padding: 0; }
+.side dl.gloss { grid-template-columns: 1fr; gap: 0; margin: 0; }
+.side dl.gloss dt { font-size: 0.9rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); }
+.side dl.gloss dt:first-of-type { border-top: 0; padding-top: 0; }
+.side dl.gloss dt small { display: inline; margin-left: 0.35rem; }
+.side dl.gloss dd { font-size: 0.84rem; line-height: 1.6; color: var(--fg-dim); margin: 0.1rem 0 0.4rem; }
+@media (min-width: 1100px) {
+  .layout { grid-template-columns: 17rem minmax(0, 47rem); gap: 2.5rem; justify-content: center; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .side { order: 0; padding: 0; }
+  .side-inner { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.2rem); max-height: calc(100vh - 2.4rem); overflow-y: auto; margin-top: 2.5rem; }
+  .layout .wrap { margin: 0; padding-left: 0; padding-right: 0; }
+}
+</style>
 <title>CNN 表徵審查導讀</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -134,6 +153,27 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
 </head>
 <body>
 
+<div class="layout">
+<aside class="side" id="gloss" aria-label="術語表">
+  <div class="side-inner">
+    <div class="side-label">glossary</div>
+    <h2 class="side-title">術語表</h2>
+    <dl class="gloss">
+    <dt>表徵<small>representation</small></dt><dd>模型內部用來描述一張圖的數字，這裡指 2,048 維的特徵向量。</dd>
+    <dt>審查<small>audit</small></dt><dd>不改模型，從外部系統性地檢查它學到了什麼。</dd>
+    <dt>捷徑學習<small>shortcut learning</small></dt><dd>模型靠與答案碰巧相關、但無關病灶的線索答對。</dd>
+    <dt>資料洩漏<small>data leakage</small></dt><dd>測試資料的資訊混進訓練資料，讓成績被高估。</dd>
+    <dt>交叉驗證<small>k-fold cross-validation</small></dt><dd>把資料分成 k 組，輪流拿一組當測試、其他當訓練。</dd>
+    <dt>Out-of-fold<small>OOF</small></dt><dd>每筆資料都由沒訓練過它的模型來處理。</dd>
+    <dt>PCA<small>principal component analysis</small></dt><dd>找出資料變異最大的方向，用較少維度表示資料。</dd>
+    <dt>ARI<small>adjusted Rand index</small></dt><dd>分群結果與真實類別的吻合度，扣掉亂分的期望值。</dd>
+    <dt>Radiomics<small>影像組學</small></dt><dd>從醫學影像算出的手工定量特徵，例如亮度、形狀、紋理。</dd>
+    <dt>Spearman 相關<small>Spearman ρ</small></dt><dd>用排名算的相關係數，只看兩者是否一起變大變小。</dd>
+    <dt>Grad-CAM</dt><dd>用梯度找出模型做判斷時最依賴的影像區域，畫成熱圖。</dd>
+    <dt>Specificity<small>本文定義</small></dt><dd>注意力區域中，落在腫瘤內的比例。</dd>
+  </dl>
+  </div>
+</aside>
 <div class="wrap">
 <header>
   <div class="eyebrow">&gt; paper tutorial · MLCN 2026 @ MICCAI</div>
@@ -379,27 +419,12 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
   <p>把限制寫清楚不是示弱，而是讓讀者知道結果可以相信到什麼程度。</p>
 </section>
 
-<section id="gloss">
-  <h2><span class="lesson">glossary</span>術語表</h2>
-  <dl class="gloss">
-    <dt>表徵<small>representation</small></dt><dd>模型內部用來描述一張圖的數字，這裡指 2,048 維的特徵向量。</dd>
-    <dt>審查<small>audit</small></dt><dd>不改模型，從外部系統性地檢查它學到了什麼。</dd>
-    <dt>捷徑學習<small>shortcut learning</small></dt><dd>模型靠與答案碰巧相關、但無關病灶的線索答對。</dd>
-    <dt>資料洩漏<small>data leakage</small></dt><dd>測試資料的資訊混進訓練資料，讓成績被高估。</dd>
-    <dt>交叉驗證<small>k-fold cross-validation</small></dt><dd>把資料分成 k 組，輪流拿一組當測試、其他當訓練。</dd>
-    <dt>Out-of-fold<small>OOF</small></dt><dd>每筆資料都由沒訓練過它的模型來處理。</dd>
-    <dt>PCA<small>principal component analysis</small></dt><dd>找出資料變異最大的方向，用較少維度表示資料。</dd>
-    <dt>ARI<small>adjusted Rand index</small></dt><dd>分群結果與真實類別的吻合度，扣掉亂分的期望值。</dd>
-    <dt>Radiomics<small>影像組學</small></dt><dd>從醫學影像算出的手工定量特徵，例如亮度、形狀、紋理。</dd>
-    <dt>Spearman 相關<small>Spearman ρ</small></dt><dd>用排名算的相關係數，只看兩者是否一起變大變小。</dd>
-    <dt>Grad-CAM</dt><dd>用梯度找出模型做判斷時最依賴的影像區域，畫成熱圖。</dd>
-    <dt>Specificity<small>本文定義</small></dt><dd>注意力區域中，落在腫瘤內的比例。</dd>
-  </dl>
-</section>
+
 
 <footer>
   © 2026 賴鉑崴 · 本導讀依據已發表的論文撰寫，數字與完整細節以<a href="https://papers.miccai.org/miccai-2026-sat/paper/MLCN_2026_035.pdf" target="_blank" rel="noopener">論文原文</a>為準。 · <a href="https://s9988766-creator.github.io">回到首頁</a>
 </footer>
+</div>
 </div>
 
 <script>

@@ -182,7 +182,7 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
   <div class="eyebrow">&gt; paper tutorial · GCBME 2026</div>
   <h1 style="margin-top:.4rem">深度腦 MRI 配準裡，<br>什麼才真正重要？</h1>
   <p class="lede">給只修過基礎微積分和統計的讀者：為什麼「Dice 又高了一點」常常不是模型設計的功勞，以及怎麼用控制變因的實驗，找出真正讓變形保持合理的那個因素。</p>
-  <p class="meta">論文：<i>A Matched-Protocol Ablation of Deep Brain MRI Registration: Supervision, Step Composition, and Deformation Regularity</i><br>作者：賴鉑崴、Ming-Chang Chiang、Po-Kai Yang　·　第七屆全球生物醫學工程研討會暨台灣生物醫學工程學會年會 (GCBME 2026)　·　預計閱讀 45–60 分鐘</p>
+  <p class="meta">論文：<i>A Matched-Protocol Ablation of Deep Brain MRI Registration: Supervision, Step Composition, and Deformation Regularity</i><br>Author：Bo-Wei Lai, Ming-Chang Chiang, Po-Kai Yang <br>　第七屆全球生物醫學工程研討會暨台灣生物醫學工程學會年會 (GCBME 2026)</p>
   <div class="links">
     <a class="plink" href="../../papers/GCBME2026_Lai_Chiang_Yang.pdf" target="_blank" rel="noopener">[paper]</a>
     <a class="plink" href="https://github.com/s9988766-creator/GCBME2026-brain-registration" target="_blank" rel="noopener">[project]</a>
@@ -201,7 +201,6 @@ footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line
     <li><a href="#gloss">術語表</a></li>
   </ul>
   <div class="thesis"><b>一句話版本：</b>在同一份驗證過的評測協議和同一份訓練食譜下訓練十個模型，結果是：<b class="g">有沒有用解剖標籤監督</b>對 Dice 的影響，比換任何一種架構都大；而變形會不會折疊，關鍵是<b class="m">連續的小步驟是「合成」還是「相加」</b>：用了速度場但每步「相加」，照樣折疊；速度場配上「合成」（例如 scaling and squaring）才幾乎不折疊。</div>
-  <p class="legend">標著 <span class="tag-orig">原文</span> 的區塊是論文裡對應的英文句子；標著 <span class="tag-deep">進階</span> 的區塊有公式，第一次讀可以先跳過。</p>
 </header>
 
 <section id="l1">

@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="GCBME 2026 論文中文互動導讀：深度腦 MRI 配準裡，什麼才真正重要？監督決定準確度，步驟的代數決定拓撲。">
+<link rel="icon" type="image/png" href="../../img/avatar.png">
+<style>body{margin:0} img{max-width:100%} [hidden]{display:none!important}
+/* glossary sidebar: sticky left column on wide screens, end of page on narrow ones */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); }
+.side { order: 2; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 3rem; }
+.side-inner { max-width: 47rem; margin: 0 auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.1rem; }
+.side-label { font-family: var(--font-pixel); font-size: 0.78rem; color: var(--accent); letter-spacing: 0.06em; }
+.side-label::before { content: "// "; }
+.side-title { font-size: 1.15rem; color: var(--accent2); margin: 0.1rem 0 0.6rem; border: 0; padding: 0; }
+.side dl.gloss { grid-template-columns: 1fr; gap: 0; margin: 0; }
+.side dl.gloss dt { font-size: 0.9rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); }
+.side dl.gloss dt:first-of-type { border-top: 0; padding-top: 0; }
+.side dl.gloss dt small { display: inline; margin-left: 0.35rem; }
+.side dl.gloss dd { font-size: 0.84rem; line-height: 1.6; color: var(--fg-dim); margin: 0.1rem 0 0.4rem; }
+@media (min-width: 1100px) {
+  .layout { grid-template-columns: 17rem minmax(0, 47rem); gap: 2.5rem; justify-content: center; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .side { order: 0; padding: 0; }
+  .side-inner { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.2rem); max-height: calc(100vh - 2.4rem); overflow-y: auto; margin-top: 2.5rem; }
+  .layout .wrap { margin: 0; padding-left: 0; padding-right: 0; }
+}
+</style>
+<title>腦 MRI 配準消融導讀</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one reading column on the homepage's beige grid paper; lessons in order, with the three audit modules as the spine.
+   Same identity as s9988766-creator.github.io: orange pixel labels, slate-indigo headings, readable Inter / Noto Sans TC body. Light only. */
+:root {
+  --bg: #ebe4d8;
+  --bg-grid: rgba(75, 79, 134, 0.06);
+  --panel: #f6f1e8;
+  --panel-2: #efe7da;
+  --line: #d8ccb8;
+  --fg: #33324d;
+  --fg-dim: #67647c;
+  --accent: #d2602a;
+  --accent2: #4b4f86;
+  --mint: #3c7a4c;
+  --accent-soft: rgba(210, 96, 42, 0.12);
+  --accent2-soft: rgba(75, 79, 134, 0.1);
+  --mint-soft: rgba(60, 122, 76, 0.12);
+  --glioma: #d2602a;
+  --mening: #4b4f86;
+  --pit: #3c7a4c;
+  --tumor: #c0353a;
+  --fold: #c0353a;
+  --font-pixel: "Silkscreen", "JetBrains Mono", ui-monospace, monospace;
+  --font-body: "Inter", "Noto Sans TC", system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background-color: var(--bg);
+  background-image: linear-gradient(var(--bg-grid) 1px, transparent 1px), linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.8;
+}
+.wrap {
+  max-width: 47rem; margin: 0 auto;
+  padding-block: 2.5rem 5rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; border-radius: 3px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.4; margin: 0; }
+h1 { font-size: clamp(1.6rem, 4.6vw, 2.1rem); font-weight: 700; }
+h2 { font-size: 1.45rem; font-weight: 700; color: var(--accent2); margin-top: 3.4rem; padding-top: 1.3rem; border-top: 1px dashed var(--line); }
+h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1.8rem; }
+p { margin: 0.8rem 0; }
+.eyebrow { font-family: var(--font-pixel); font-size: 0.85rem; letter-spacing: 0.05em; color: var(--accent); }
+.lesson { display: block; font-family: var(--font-pixel); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 0.25rem; font-weight: 400; }
+.lesson::before { content: "// "; }
+.lede { font-size: 1.08rem; color: var(--fg-dim); margin-top: 0.6rem; }
+.meta { font-size: 0.88rem; color: var(--fg-dim); }
+code, .mono { font-family: var(--font-mono); font-size: 0.88em; }
+code { background: var(--accent2-soft); padding: 0.05em 0.35em; border-radius: 3px; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.g { color: var(--glioma); font-weight: 700; } .m { color: var(--mening); font-weight: 700; } .p { color: var(--pit); font-weight: 700; }
+
+.toc { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 1.5rem 0 0; padding: 0; list-style: none; }
+.toc a { display: inline-block; font-size: 0.82rem; color: var(--fg); border: 1px solid var(--line); background: var(--panel); padding: 0.1rem 0.65rem; border-radius: 999px; }
+.toc a:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+.thesis { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px; padding: 1rem 1.25rem; margin-top: 1.6rem; font-size: 1.04rem; }
+.legend { font-size: 0.9rem; color: var(--fg-dim); margin-top: 1rem; }
+.links { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1rem; }
+.plink { font-family: var(--font-mono); font-size: 0.78rem; padding: 0.15rem 0.6rem; border-radius: 5px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); }
+.plink:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.analogy { border-left: 3px solid var(--accent2); padding: 0.15rem 0 0.15rem 1rem; margin: 1rem 0; }
+.analogy b { color: var(--accent2); }
+.math { font-family: var(--font-mono); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 0.7rem 1rem; margin: 1rem 0; overflow-x: auto; font-size: 0.93rem; }
+
+.tag-orig, .tag-deep { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em; padding: 0.05rem 0.45rem; border-radius: 4px; white-space: nowrap; }
+.tag-orig { color: var(--fg-dim); border: 1px solid var(--line); background: var(--panel); }
+.tag-deep { color: var(--accent2); border: 1px solid var(--accent2); background: var(--accent2-soft); }
+aside.orig { margin: 1.4rem 0; display: grid; gap: 0.5rem; }
+aside.orig blockquote { margin: 0; padding: 0.15rem 0 0.15rem 1rem; border-left: 2px solid var(--line); font-family: var(--font-body); font-size: 0.93rem; line-height: 1.65; color: var(--fg-dim); }
+.deep { margin: 1.4rem 0; padding: 1rem 1.2rem; border: 1px solid var(--line); border-top: 3px solid var(--accent2); border-radius: 8px; background: var(--panel); min-width: 0; }
+.deep h4 { font-size: 1rem; margin: 1.1rem 0 0.2rem; color: var(--accent2); }
+.deep h4:first-of-type { margin-top: 0.7rem; }
+.deep p, .deep li { font-size: 0.95rem; }
+mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 0.2rem 0; }
+
+figure { margin: 1.4rem 0; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 1rem; }
+figure img { display: block; width: 100%; height: auto; border-radius: 4px; background: #fff; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption { font-size: 0.86rem; color: var(--fg-dim); margin-top: 0.6rem; line-height: 1.65; }
+svg text { font-family: var(--font-body); font-size: 12px; }
+
+.tbl { overflow-x: auto; margin: 1rem 0; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.78rem; color: var(--fg-dim); letter-spacing: 0.03em; white-space: nowrap; font-weight: 600; }
+tr:last-child td { border-bottom: none; }
+td.n { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel-2); }
+.seg button { font: inherit; font-size: 0.85rem; padding: 0.3rem 0.8rem; border: 0; background: transparent; color: var(--fg-dim); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent2); color: #fff; }
+.ctrl { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; margin-top: 0.8rem; font-size: 0.9rem; }
+.ctrl label { color: var(--fg-dim); }
+.ctrl input[type=range] { flex: 1 1 10rem; accent-color: var(--accent); }
+.demo { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr); gap: 1.2rem; align-items: start; }
+.demo canvas { width: 100%; max-width: 260px; aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--line); background: #2a2a33; display: block; }
+.metrics { display: grid; gap: 0.5rem; }
+.metrics table td, .metrics table th { padding: 0.35rem 0.55rem; }
+.verdict { font-size: 0.88rem; color: var(--fg-dim); }
+@media (max-width: 600px) { .demo { grid-template-columns: minmax(0, 1fr); } .demo canvas { margin: 0 auto; } }
+
+.ex { background: var(--panel); border: 1px dashed var(--line); border-radius: 8px; padding: 0.9rem 1.1rem; margin: 0.8rem 0; }
+details summary { cursor: pointer; color: var(--accent); font-size: 0.9rem; margin-top: 0.4rem; }
+dl.gloss { display: grid; grid-template-columns: minmax(7rem, max-content) 1fr; gap: 0.45rem 1rem; margin: 1rem 0; }
+dl.gloss dt { font-weight: 700; }
+dl.gloss dt small { display: block; font-family: var(--font-mono); font-weight: 400; color: var(--fg-dim); font-size: 0.74rem; }
+dl.gloss dd { margin: 0; min-width: 0; }
+@media (max-width: 480px) { dl.gloss { grid-template-columns: 1fr; } dl.gloss dd { margin-bottom: 0.6rem; } }
+ol.plain { padding-left: 1.4rem; margin: 0.6rem 0; }
+footer { margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: 0.82rem; color: var(--fg-dim); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+<script>window.MathJax={tex:{inlineMath:[["\\(","\\)"]],displayMath:[["\\[","\\]"]]},svg:{fontCache:"global"}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+</head>
+<body>
+
+<div class="layout">
+<aside class="side" id="gloss" aria-label="術語表">
+  <div class="side-inner">
+    <div class="side-label">glossary</div>
+    <h2 class="side-title">術語表</h2>
+    <dl class="gloss">
+    <dt>配準<small>registration</small></dt><dd>把一張影像變形，使它的解剖構造對齊另一張影像。</dd>
+    <dt>Atlas<small>圖譜</small></dt><dd>當作參考的標準腦影像。本文把 atlas 變形去對齊每位受試者。</dd>
+    <dt>形變場<small>deformation field</small></dt><dd>告訴每個體素要移到哪裡的向量場，網路的輸出就是它。</dd>
+    <dt>Dice</dt><dd>兩個區域的重疊程度，1 是完全重疊、0 是完全沒有。</dd>
+    <dt>折疊<small>folding, J<sub>neg</sub></small></dt><dd>形變讓空間自己反折、擠在一起。用「Jacobian 行列式 ≤ 0 的體素比例」衡量。</dd>
+    <dt>Jacobian 行列式<small>det J</small></dt><dd>某處的局部體積變化倍率。大於 0 是正常拉伸或壓縮，小於 0 代表空間翻面了。</dd>
+    <dt>微分同胚<small>diffeomorphism</small></dt><dd>平滑、可逆、反函數也平滑的變形，不會撕裂也不會折疊。</dd>
+    <dt>速度場<small>velocity field</small></dt><dd>不直接預測位移，而是預測「每一點每個瞬間往哪走」，再沿著它積分出位移。</dd>
+    <dt>Scaling and squaring</dt><dd>先把速度場除以 2⁷，再自己跟自己合成 7 次，一個便宜的指數映射近似。</dd>
+    <dt>合成 vs 相加<small>compose / add</small></dt><dd>合成是把新一步套在目前的變形上；相加是把位移量直接加進去。</dd>
+    <dt>弱監督<small>weak supervision</small></dt><dd>訓練時用解剖標籤算損失，但標籤不當網路輸入，推論時不需要。</dd>
+    <dt>NCC<small>normalized cross-correlation</small></dt><dd>衡量兩張影像灰階圖樣有多像的指標，不受整體亮度影響。</dd>
+    <dt>配對檢定<small>paired test</small></dt><dd>同一批受試者上比較兩個模型，看差異是否一致。</dd>
+    <dt>Cohen's d<sub>z</sub></dt><dd>配對資料的效果量：平均差異除以差異的標準差。</dd>
+  </dl>
+  </div>
+</aside>
+<div class="wrap">
+<header>
+  <div class="eyebrow">&gt; paper tutorial · GCBME 2026</div>
+  <h1 style="margin-top:.4rem">深度腦 MRI 配準裡，<br>什麼才真正重要？</h1>
+  <p class="lede">給只修過基礎微積分和統計的讀者：為什麼「Dice 又高了一點」常常不是模型設計的功勞，以及怎麼用控制變因的實驗，找出真正讓變形保持合理的那個因素。</p>
+  <p class="meta">論文：<i>A Matched-Protocol Ablation of Deep Brain MRI Registration: Supervision, Step Composition, and Deformation Regularity</i><br>作者：賴鉑崴、Ming-Chang Chiang、Po-Kai Yang　·　第七屆全球生物醫學工程研討會暨台灣生物醫學工程學會年會 (GCBME 2026)　·　預計閱讀 45–60 分鐘</p>
+  <div class="links">
+    <a class="plink" href="../../papers/GCBME2026_Lai_Chiang_Yang.pdf" target="_blank" rel="noopener">[paper]</a>
+    <a class="plink" href="https://github.com/s9988766-creator/GCBME2026-brain-registration" target="_blank" rel="noopener">[project]</a>
+  </div>
+  <ul class="toc">
+    <li><a href="#l1">1 為什麼只比 Dice 會誤導</a></li>
+    <li><a href="#l2">2 配準、Dice 與折疊</a></li>
+    <li><a href="#l3">3 先驗證尺，再量東西</a></li>
+    <li><a href="#l4">4 六個模型，一份食譜</a></li>
+    <li><a href="#l5">5 監督決定準確度</a></li>
+    <li><a href="#l6">6 積分換來拓撲</a></li>
+    <li><a href="#l7">7 合成還是相加</a></li>
+    <li><a href="#l8">8 一個負面結果</a></li>
+    <li><a href="#results">結果總整理</a></li>
+    <li><a href="#limits">這篇沒有證明什麼</a></li>
+    <li><a href="#gloss">術語表</a></li>
+  </ul>
+  <div class="thesis"><b>一句話版本：</b>在同一份驗證過的評測協議和同一份訓練食譜下訓練十個模型，結果是：<b class="g">有沒有用解剖標籤監督</b>對 Dice 的影響，比換任何一種架構都大；而變形會不會折疊，關鍵是<b class="m">連續的小步驟是「合成」還是「相加」</b>：用了速度場但每步「相加」，照樣折疊；速度場配上「合成」（例如 scaling and squaring）才幾乎不折疊。</div>
+  <p class="legend">標著 <span class="tag-orig">原文</span> 的區塊是論文裡對應的英文句子；標著 <span class="tag-deep">進階</span> 的區塊有公式，第一次讀可以先跳過。</p>
+</header>
+
+<section id="l1">
+  <h2><span class="lesson">lesson 1</span>為什麼只比 Dice 會誤導</h2>
+  <p>配準（registration）的論文通常長這樣：提出新架構，在公開資料集上量 Dice，然後和別人發表的數字比，高就是進步。問題是，一個 Dice 數字背後藏著很多不寫在表格裡的選擇：</p>
+  <ol class="plain">
+    <li><b>方向</b>：是把 atlas 變形去對齊受試者，還是反過來？</li>
+    <li><b>評估哪些標籤</b>：46 個結構全算，還是只算其中 17 組的平均？</li>
+    <li><b>標籤怎麼變形</b>：用最近鄰插值，還是先轉成 one-hot 再三線性插值、最後取 argmax？</li>
+    <li><b>有沒有用標籤監督</b>：訓練時有沒有讓網路看到解剖標籤？</li>
+  </ol>
+  <p>這些選擇每一個都會讓 Dice 動好幾個百分點。如果兩篇論文選得不一樣，高的那個高在哪裡，根本說不清楚。</p>
+  <div class="analogy"><b>我們自己踩過的坑：</b>早期實驗裡，我們的模型 Dice 是 0.766，看起來贏過已發表的 VoxelMorph（0.729）和 TransMorph（0.753）。後來把評測協議對齊成他們的版本，這個優勢就消失了。這篇論文就是從這次教訓長出來的。</div>
+  <p>所以做法反過來：不去提新架構，而是<b>鎖定一個評測協議、一份訓練食譜，一次只改變一個因素</b>（這叫消融實驗，ablation），看每個因素到底值多少。論文的四個貢獻：</p>
+  <ol class="plain">
+    <li>驗證過的官方 TransMorph IXI 基準重現。</li>
+    <li>4 種架構 × 2 種監督程度的消融，在 115 位測試受試者上做配對統計。</li>
+    <li>一組單一變因對照，把「步驟怎麼合併」和「速度場是否固定」分開。</li>
+    <li>我們先前提出的凍結 VAE 編碼器的負面結果。</li>
+  </ol>
+  <aside class="orig"><span class="tag-orig">原文 · §1 Introduction</span>
+    <blockquote lang="en">Reported scores depend on the registration direction, which labels are evaluated, how they are warped, and whether supervision is used in training, so a higher Dice cannot be attributed to model design alone.</blockquote>
+  </aside>
+</section>
+
+<section id="l2">
+  <h2><span class="lesson">lesson 2</span>配準、Dice 與折疊：兩把尺</h2>
+  <p><b>配準</b>是把一張影像「揉」成另一張的樣子。這篇的設定叫 atlas-to-subject：<b>atlas</b>（一張標準腦影像）當作移動影像，每位受試者的 MRI 當作固定影像。網路看到這一對影像，輸出一個<b>形變場</b>，告訴 atlas 上每個體素該移到哪裡；用這個形變場把 atlas 揉過去，再看它的解剖結構跟受試者有沒有對上。</p>
+  <p>我們用兩把尺來量結果，兩把尺量的是完全不同的東西：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>尺</th><th>量什麼</th><th>越好是</th></tr></thead>
+    <tbody>
+      <tr><td><b>Dice</b></td><td>揉過去的 atlas 標籤，跟受試者的真實標籤重疊多少。<b>準確度</b></td><td>越大越好</td></tr>
+      <tr><td><b>折疊率 J<sub>neg</sub></b></td><td>形變場裡有多少比例的體素，局部體積倍率 ≤ 0。<b>變形合不合理</b></td><td>越小越好</td></tr>
+    </tbody>
+  </table></div>
+  <div class="analogy"><b>為什麼要看折疊：</b>真的大腦不會把一塊組織翻面疊在另一塊上。如果形變場在某處折疊，那裡的對應關係就是錯的，形變場也沒辦法反轉。而很多下游分析（例如用形變場量局部體積變化的 tensor-based morphometry，或追蹤同一個人多年的變化）直接使用形變場，不是只用揉完的影像。Dice 好看，折疊嚴重，這個形變場就不能用。</div>
+  <p>評測細節：IXI 腦 MRI，去顱骨、已仿射對齊，160×192×224 體素、1 mm。576 位受試者分成 403 訓練、58 驗證、115 測試。FreeSurfer 標籤整理成 46 類；Dice 是左右對稱結構先平均，再對官方的 17 個解剖群組取平均。</p>
+  <div class="deep"><span class="tag-deep">進階</span>
+    <h4>Dice</h4>
+    <p>對某個結構，設揉過去的 atlas 標籤區域為 \(A\)、受試者真實標籤區域為 \(B\)：</p>
+    \[\mathrm{Dice}(A,B)=\frac{2\,|A\cap B|}{|A|+|B|}.\]
+    <h4>折疊與 Jacobian 行列式</h4>
+    <p>形變 \(\varphi(\mathbf{x})=\mathbf{x}+\mathbf{u}(\mathbf{x})\) 在 \(\mathbf{x}\) 附近的局部體積倍率，是它的 Jacobian 矩陣的行列式 \(\det D\varphi=\det(I+\nabla\mathbf{u})\)。大於 1 是局部膨脹、介於 0 到 1 是壓縮；小於 0 代表這一小塊空間被翻面。折疊率就是</p>
+    \[J_{\mathrm{neg}}=\frac{\#\{\mathbf{x}:\det D\varphi(\mathbf{x})\le 0\}}{\#\text{所有體素}}\times 100\%.\]
+    <p>一維的情況最好想：\(\varphi(x)=x+u(x)\) 的 Jacobian 是 \(1+u'(x)\)。只要位移 \(u\) 在某處的斜率比 −1 還陡，\(\varphi\) 就不再單調遞增，也就是「走過頭、折回來」。lesson 7 的示範用的就是這個一維版本。</p>
+  </div>
+</section>
+
+<section id="l3">
+  <h2><span class="lesson">lesson 3</span>先驗證尺，再量東西</h2>
+  <p>在訓練任何模型之前，我們先確認自己寫的評測程式量出來的數字，和官方的一模一樣。三個檢查：</p>
+  <ol class="plain">
+    <li>用我們的程式重新彙整官方釋出的逐受試者結果，<b>十一個方法的 Dice 全部對得上</b>已發表的數字（下表節錄）。</li>
+    <li>從我們手上那份資料重算 affine Dice，和官方釋出的值在 46 類 × 115 位受試者上差距不超過 5×10⁻¹⁰。</li>
+    <li>重跑官方釋出的 VoxelMorph-1 和 TransMorph 權重，平均值重現，逐受試者的相關係數是 1.0000。</li>
+  </ol>
+  <div class="tbl"><table>
+    <thead><tr><th>方法</th><th>我們重算</th><th>原論文發表</th></tr></thead>
+    <tbody>
+      <tr><td>Affine（不變形）</td><td class="n">0.3858</td><td class="n">0.386</td></tr>
+      <tr><td>SyN (ANTs)</td><td class="n">0.6445</td><td class="n">0.645</td></tr>
+      <tr><td>VoxelMorph-1</td><td class="n">0.7293</td><td class="n">0.729</td></tr>
+      <tr><td>TransMorph</td><td class="n">0.7527</td><td class="n">0.753</td></tr>
+    </tbody>
+  </table></div>
+  <p>這一步看起來很無聊，卻是整篇可信度的地基。如果尺本身不準，後面所有「A 比 B 高 0.01」都沒有意義。</p>
+  <aside class="orig"><span class="tag-orig">原文 · §2.2 Protocol calibration</span>
+    <blockquote lang="en">Re-aggregating the released per-subject results reproduced the published Dice of all eleven methods (Table 1). […] Rerunning the released VoxelMorph-1 and TransMorph checkpoints reproduced their published means, with a per-subject correlation of 1.0000.</blockquote>
+  </aside>
+</section>
+
+<section id="l4">
+  <h2><span class="lesson">lesson 4</span>六個模型，一份食譜</h2>
+  <p>所有模型共用同一份訓練食譜：損失函數、優化器、100 個 epoch、選驗證集 Dice 最高的檢查點、測試集只評估一次。唯一不同的是被研究的因素。</p>
+  <div class="math">損失 = −NCC(9)  +  λ · Grad(φ)  +  β · (1 − softDice)<br>　　 影像相似　　平滑正則　　 解剖標籤（監督）<br>λ = 1；無監督 β = 0，弱監督 β = 1</div>
+  <p>弱監督的 soft-Dice 項只出現在損失裡，標籤<b>不會</b>輸入網路，所以推論時仍然只需要一對影像。六個架構：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>代號</th><th>模型</th><th>預測什麼</th><th>步驟怎麼合併</th></tr></thead>
+    <tbody>
+      <tr><td class="n"><b>A</b></td><td>VoxelMorph-1（U-Net）</td><td>直接預測位移場</td><td>不適用</td></tr>
+      <tr><td class="n"><b>B</b></td><td>A 加上 scaling and squaring</td><td>穩態速度場</td><td><b class="m">合成</b>（2⁷ 次自我合成）</td></tr>
+      <tr><td class="n"><b>C</b></td><td>凍結 VAE 編碼器 ＋ S&amp;S</td><td>穩態速度場（半解析度）</td><td><b class="m">合成</b></td></tr>
+      <tr><td class="n"><b>D</b></td><td>凍結 VAE 編碼器 ＋ Euler</td><td>時變速度場，10 步</td><td><b class="g">相加</b></td></tr>
+      <tr><td class="n"><b>E</b></td><td>U-Net，時變</td><td>時變速度場，5 步</td><td><b class="m">合成</b></td></tr>
+      <tr><td class="n"><b>F</b></td><td>U-Net，時變</td><td>時變速度場，5 步</td><td><b class="g">相加</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>A 到 D 各訓練有／無監督兩種，共 8 個模型；E 和 F 只做弱監督，共 10 個。為什麼要加 E 和 F？因為 C 和 D 同時差了兩件事（速度場是穩態還是時變、步驟是合成還是相加），單看 C vs D 分不出是哪一個造成的。E 和 F 用同一個 U-Net、同樣的參數量（278,707）和步數，<b>只差合併規則</b>，把這兩個因素拆開。</p>
+  <div class="deep"><span class="tag-deep">進階</span>
+    <h4>速度場與 scaling and squaring</h4>
+    <p>如果網路直接輸出位移場 \(\mathbf{u}\)，形變是 \(\varphi=\mathrm{id}+\mathbf{u}\)，沒有任何東西保證它可逆。另一條路是讓網路輸出一個<b>穩態速度場</b> \(v\)，把它想成一條河的流速，把 atlas 上的每個點丟進河裡漂 1 單位時間：</p>
+    \[\frac{\partial\varphi_t}{\partial t}=v(\varphi_t),\qquad \varphi_0=\mathrm{id},\qquad \varphi=\varphi_1=\exp(v).\]
+    <p>這樣得到的 \(\varphi\) 是一個一參數群作用的結果，理論上必定可逆。實務上用 scaling and squaring 近似指數映射：先縮小 \(v\to v/2^7\)（縮小後幾乎是恆等映射），再把這個映射自己和自己合成 7 次：\(\varphi\leftarrow\varphi\circ\varphi\)，每次相當於把流動時間加倍，合成 7 次就等於 \(2^7\) 個小步驟。合成層沒有任何可訓練參數，所以 A 到 B 唯一的改變就是積分。</p>
+  </div>
+</section>
+
+<section id="l5">
+  <h2><span class="lesson">lesson 5</span>監督決定準確度</h2>
+  <p>先看最直接的對照：同一個架構，訓練時加不加解剖標籤的 soft-Dice 損失。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>架構</th><th>無監督 Dice</th><th>弱監督 Dice</th><th>差距</th><th>變好的受試者</th></tr></thead>
+    <tbody>
+      <tr><td>A 直接位移</td><td class="n">0.7314</td><td class="n">0.8161</td><td class="n"><b>+0.085</b></td><td class="n">115 / 115</td></tr>
+      <tr><td>B ＋ S&amp;S</td><td class="n">0.7435</td><td class="n">0.8146</td><td class="n"><b>+0.071</b></td><td class="n">115 / 115</td></tr>
+      <tr><td>C 凍結 VAE</td><td class="n">0.7260</td><td class="n">0.8014</td><td class="n"><b>+0.075</b></td><td class="n">115 / 115</td></tr>
+    </tbody>
+  </table></div>
+  <p>三個架構都一樣：監督讓 115 位測試受試者<b>每一位</b>都變好，效果量 d<sub>z</sub> 在 4.35 到 6.39 之間（很大）。作為對照，同一個監督設定下，不同架構之間最大的 Dice 差距只有 0.0176。<b>監督的影響，比換架構大四到五倍。</b></p>
+  <p>這帶出一個很重要的陷阱。弱監督的 VoxelMorph-1 Dice 是 0.8161，而官方釋出的無監督 TransMorph 是 0.7527，而且我們的模型參數只有 27 萬、對方有 4,680 萬。如果只看表，你會以為小模型贏了大模型。但兩者差在監督，不是架構或容量，所以<b>要比較模型設計，必須在相同的監督程度下比</b>。</p>
+  <div class="analogy"><b>順帶一提，我們怎麼確認自己的訓練程式沒問題：</b>我們的無監督 VoxelMorph-1 得到 0.7314，官方釋出的權重是 0.7293，差異不顯著（配對 t 檢定 p = 0.06）。如果連這個都對不上，後面任何差異都可能只是來自我們的訓練迴圈有問題，而不是被研究的因素。</div>
+  <aside class="orig"><span class="tag-orig">原文 · §3.1</span>
+    <blockquote lang="en">Notably, weakly supervised VoxelMorph-1 beat the released unsupervised TransMorph checkpoint (0.8161 versus 0.7527) with far fewer parameters (274,000 versus 46.8 million). The two differ in supervision, so this reflects neither architecture nor capacity […]</blockquote>
+  </aside>
+  <div class="deep"><span class="tag-deep">進階</span>
+    <h4>為什麼用「配對」統計</h4>
+    <p>所有模型都在同樣的 115 位受試者上評估，所以每位受試者都有「模型 1 的 Dice」和「模型 2 的 Dice」兩個數字。把兩者相減得到 115 個差值 \(d_k\)，配對 t 檢定看這些差值的平均是否為 0，效果量是</p>
+    \[d_z=\frac{\bar d}{s_d}.\]
+    <p>它回答的是「差異有多一致」，不是「差異有多大」：若 115 個差值幾乎都是正的，即使平均只有 0.001，d<sub>z</sub> 也會很大。這也是為什麼論文的限制段特別提醒：這 115 位受試者都在同一個訓練好的模型之下，p 值只說明「那一個檢查點」贏得多一致，不代表那種設計一般來說贏得多可靠。我們另外量過訓練種子的變異，大約 0.0022 Dice，所以小於這個量的差異不能當作有偵測到。</p>
+  </div>
+</section>
+
+<section id="l6">
+  <h2><span class="lesson">lesson 6</span>積分換來拓撲：A 到 B</h2>
+  <p>固定在弱監督下，把「直接預測位移」（A）換成「預測穩態速度場，再用 scaling and squaring 積分」（B）：</p>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>A 直接位移</th><th>B ＋ S&amp;S</th></tr></thead>
+    <tbody>
+      <tr><td>Dice</td><td class="n">0.8161</td><td class="n">0.8146（−0.0015）</td></tr>
+      <tr><td>折疊率 J<sub>neg</sub></td><td class="n">1.080%</td><td class="n"><b>0.000004%</b></td></tr>
+      <tr><td>每位受試者折疊體素數</td><td class="n">74,325</td><td class="n"><b>不到 1</b></td></tr>
+      <tr><td>log-Jacobian 標準差</td><td class="n">1.487</td><td class="n">0.363</td></tr>
+      <tr><td>平均位移大小（體素）</td><td class="n">3.37</td><td class="n">3.41</td></tr>
+    </tbody>
+  </table></div>
+  <p>Dice 只掉了 0.0015，在訓練種子的變異範圍（約 0.0022）之內，基本上看不出來；折疊卻從每位受試者 7 萬多個體素降到不到 1 個，差了<b>五個數量級以上</b>。</p>
+  <p>最後一列是關鍵的排除檢查：B 並不是靠「變形變少」換來好拓撲的。兩者的平均位移幾乎一樣大（3.41 vs 3.37 體素），都在做同樣大的變形，只是 B 的形變場保持可逆。</p>
+  <p>沒有監督時情況更有趣：B 的 Dice 反而比 A 高 0.0121（113/115 位受試者更好）。沒有標籤把網路往「準確」方向拉時，積分帶來的平滑約束同時也幫了準確度。</p>
+</section>
+
+<section id="l7">
+  <h2><span class="lesson">lesson 7</span>合成還是相加：真正的關鍵</h2>
+  <p>看到 A 到 B，很自然會得到結論：「用速度場積分就不會折疊」。論文的 C 和 D 打破了這個結論。D 也預測速度場（時變、10 步），但它每一步是把增量<b>加</b>進去（Euler 累加）：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>弱監督</th><th>Dice</th><th>折疊率</th><th>每位受試者折疊體素</th></tr></thead>
+    <tbody>
+      <tr><td>A 完全沒有積分</td><td class="n">0.8161</td><td class="n">1.080%</td><td class="n">74,325</td></tr>
+      <tr><td>C 凍結 VAE ＋ 合成</td><td class="n">0.8014</td><td class="n">0.000006%</td><td class="n">不到 1</td></tr>
+      <tr><td class="g">D 凍結 VAE ＋ 相加</td><td class="n">0.8026</td><td class="n"><b>1.181%</b></td><td class="n"><b>81,270</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>D 用了速度場，折疊體素數卻比<b>完全不做積分的 A 還多</b>。所以「有用速度場」不是答案。但 C 和 D 同時差了「速度場是穩態或時變」和「合成或相加」，沒辦法判斷是哪個。這就是為什麼要有 E 和 F。</p>
+  <h3>先用一個比喻搞懂「合成」和「相加」</h3>
+  <p>想像要把一張橡皮布從原本的樣子，分 5 個小步驟拉成目標的樣子。兩種做法的差別在<b>每一步的指令是看哪裡來決定的</b>：</p>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>相加（add）</th><th>合成（compose）</th></tr></thead>
+    <tbody>
+      <tr><td><b>怎麼做</b></td><td>5 步的指令都是對照「<b>原本的</b>布」寫好的，最後把每個點的 5 次位移<b>全部加起來</b>，一次搬過去</td><td>每走一步，就拿「<b>現在這張已經變形過的布</b>」當新的起點，下一步的指令從新位置讀，再套上去，像一步接一步的接力</td></tr>
+      <tr><td><b>數字例子</b></td><td>相鄰兩點在 1.0 和 1.1。總位移一個是 +0.5、一個是 −0.2，加完變成 1.5 和 0.9，<b>兩點交換順序了，布被翻面（折疊）</b>。沒有人檢查過中途有沒有撞在一起</td><td>每一步只動一小段，每一步之後都重新看兩點在哪裡。兩點要交換順序，必須在<b>某一步內</b>互相穿過；只要每步夠小，就做不到，所以順序始終保持</td></tr>
+      <tr><td><b>保證</b></td><td>沒有。總位移多陡，就看運氣</td><td>每一步都可逆，串起來的整體就可逆</td></tr>
+    </tbody>
+  </table></div>
+  <p>一個容易搞混的點：<b>「相加」和「有沒有用速度場」是兩件獨立的事</b>。模型 D 預測的是速度場（看起來很高級），但它每步把增量加起來，所以等於把一個很陡的位移一次加上去，照樣折疊。反過來，scaling and squaring 之所以有效，不是因為它「有速度場」，而是它的第二步「自己跟自己合成 7 次」，也就是合成。</p>
+  <h3>先自己玩一個一維版本</h3>
+  <p>下面是一維的玩具版本，用來看「相加」和「合成」為什麼不一樣。有一個固定的位移場 \(u(x)\)，斜率最陡可以到 −A；A 超過 1 時，一次把整個位移加上去，\(\varphi(x)=x+u(x)\) 就會不再單調，也就是折疊。「合成」則是把 \(u\) 切成 N 小份，一份一份套在目前的位置上：</p>
+  <figure>
+    <svg id="fold" viewBox="0 0 640 330" role="img" aria-label="一維示意：左邊把位移一次相加，右邊把位移切成 N 步依序合成，並標出折疊的區段與比例"></svg>
+    <div class="ctrl"><label for="amp">形變強度 A（位移最陡的斜率）</label><input id="amp" type="range" min="0.5" max="6" step="0.1" value="3"><span class="num" id="ampv">3.0</span></div>
+    <div class="ctrl"><label for="nst">合成步數 N</label><input id="nst" type="range" min="1" max="128" step="1" value="5"><span class="num" id="nstv">5</span></div>
+    <p class="verdict" id="foldv"></p>
+    <figcaption><b>一維示意，不是真實模型。</b>灰色虛線是恆等映射（完全不變形，每個點留在原處，斜率 1）；曲線高於虛線代表該點被往右移、低於代表往左移，曲線的斜率小於 0 就是折疊，所以紅色只出現在曲線往下掉得最陡的中段（頂點和谷底附近斜率接近 0，不會折疊）；A 越大，這段越寬；A ≤ 1 時不會折疊。曲線是變形後每個點的位置，<span style="color:var(--fold);font-weight:700">紅色</span>是折疊（局部倒退）的區段。試試：N = 1 時兩邊完全一樣（合成一步就是相加）；把 N 拉到 128，相當於 scaling and squaring 的 2⁷；把 A 拉到 6、N 停在 5，合成也會折疊。</figcaption>
+  </figure>
+  <p>這個玩具有三個值得帶走的觀察，它們對應論文的真實結果：</p>
+  <ol class="plain">
+    <li><b>相加沒有保護。</b>只要整體位移夠陡（A &gt; 1），就會折疊。和你切成幾步無關，因為把 N 份 \(u/N\) 加起來，剛好還是 \(u\)。這就是為什麼穩態場的「相加」格子，等於直接把 \(v\) 當位移場用，也就是 A。</li>
+    <li><b>合成有保護，但要看步子大小。</b>每一步只有 \(1/N\) 的位移，只要每一小步本身沒有翻面，整個複合映射就保持可逆。</li>
+    <li><b>步數夠多才保證得到。</b>N 太小、強度太大時，每一步自己就會翻面，合成也救不了。</li>
+  </ol>
+  <h3>E 和 F：把兩個因素拆開</h3>
+  <p>同一個 U-Net、同樣 278,707 個參數、同樣 5 步、同樣的食譜，E 把每一步合成到目前的變形上，F 把每一步的增量加起來：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>弱監督、U-Net 骨幹</th><th>合成：折疊率</th><th>合成：Dice</th><th>相加：折疊率</th><th>相加：Dice</th><th>折疊比</th></tr></thead>
+    <tbody>
+      <tr><td>穩態 v(x)</td><td class="n">0.000004% (B)</td><td class="n">0.8146</td><td class="n">1.080% (A)</td><td class="n">0.8161</td><td class="n">2.7×10⁵</td></tr>
+      <tr><td>時變 v(x,t)</td><td class="n">0.0221% (E)</td><td class="n">0.8177</td><td class="n">1.078% (F)</td><td class="n">0.8215</td><td class="n"><b>48.8</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>讀法：</p>
+  <ul>
+    <li><b>往下看「相加」這一欄</b>：穩態 1.080%、時變 1.078%，幾乎一樣。速度場是穩態還是時變，在相加時完全不重要。</li>
+    <li><b>橫著看每一列</b>：合成取代相加，時變場的折疊減少 48.8 倍，穩態場減少五個數量級以上。</li>
+    <li><b>四格的 Dice 只差 0.0069，折疊卻差了五個數量級。</b>而且四格裡 Dice 最高的是 F（0.8215），也是折疊最嚴重的那一格之一。只看 Dice 的話，會選到最糟的做法。</li>
+  </ul>
+  <p>但注意 E 還是折疊了 0.0221%，遠高於 B 的 0.000004%。論文把它講得很清楚：<b>合成是「必要但不充分」</b>。</p>
+  <div class="analogy"><b>一句話：</b>步驟的合併規則（合成或相加）決定了「保證有沒有」；步子的大小決定了「保證有沒有拿到」。Scaling and squaring 先把場除以 2⁷，所以每一小步都貼近恆等映射；E 的五步 Euler 沒有做這種縮小，每一步都不小。</div>
+  <div class="deep"><span class="tag-deep">進階</span>
+    <h4>為什麼合成有「保證」</h4>
+    <p>兩個可逆映射的合成還是可逆映射，反函數是 \((g\circ f)^{-1}=f^{-1}\circ g^{-1}\)。所以如果每一步 \(\psi_k\) 都是可逆映射，由合成得到的</p>
+    \[\varphi=\psi_N\circ\cdots\circ\psi_2\circ\psi_1\]
+    <p>依構造就落在可逆映射的集合裡。這個「對合成封閉」的性質，正是穩態速度場的指數映射所做的事（一參數群）。</p>
+    <h4>為什麼相加沒有</h4>
+    <p>把增量直接加起來，\(\varphi=\mathrm{id}+\sum_k \Delta_k\) 的 Jacobian 是 \(I+\sum_k\nabla\Delta_k\)，沒有任何結構性理由讓它的行列式保持為正。單看一個 Euler 步 \(\mathbf{x}\mapsto\mathbf{x}+\Delta t\,v(\mathbf{x})\)，它只在</p>
+    \[\det\big(I+\Delta t\,\nabla v(\mathbf{x})\big)>0\]
+    <p>的地方可逆。這個條件在 \(\Delta t\,\|\nabla v\|\) 夠小時成立；對學出來的場來說，\(\nabla v\) 可以很大，就會失敗。</p>
+    <h4>穩態場「相加」為什麼等於沒積分</h4>
+    <p>如果速度場不隨時間改變，把 N 份 \(v/N\) 加起來剛好是 \(N\cdot v/N=v\)。所以穩態加法格子在數學上就是「把 \(v\) 直接當位移」，也就是模型 A。這是論文 Table 4 的說明文字特別指出來的一點。</p>
+  </div>
+  <aside class="orig"><span class="tag-orig">原文 · §3.4</span>
+    <blockquote lang="en">The step combination decides whether a guarantee is available; the step size decides whether it is obtained.</blockquote>
+  </aside>
+  <h3>十個模型放在同一張圖上</h3>
+  <p>把全部十個模型畫在「準確度 vs 折疊率」平面上（橫軸是對數，跨六個數量級）：</p>
+  <figure>
+    <svg id="plane" viewBox="0 0 640 380" role="img" aria-label="十個模型的 Dice 對折疊率散布圖，合成的模型都在左側、相加的模型都在右側"></svg>
+    <figcaption>數據是論文 Table 2 與 Table 4 的實際值（115 位測試受試者）。<b style="color:var(--accent2)">藍紫色</b>＝合成步驟，<b style="color:var(--accent)">橘色</b>＝相加步驟；實心＝弱監督，空心＝無監督。E 和 F 只有弱監督。A 和 F 的折疊率幾乎重疊（約 1.08%）。<b>每一個「合成」的模型，折疊率都低於每一個「相加」的模型，兩群完全沒有重疊，而且跟 Dice 在哪個位置幾乎無關。</b>E 最靠近這條界線，這就是「必要但不充分」。</figcaption>
+  </figure>
+</section>
+
+<section id="l8">
+  <h2><span class="lesson">lesson 8</span>一個負面結果：凍結的 VAE 編碼器</h2>
+  <p>我們先前提出過一個模型 C：不訓練編碼器，改用一個預訓練好、凍結的空間 VAE 編碼器，只訓練後面預測速度場的部分。直覺是 VAE 學到了腦影像的「生成式」結構，也許能幫配準。這篇論文用乾淨的對照把它檢驗了一遍：</p>
+  <div class="tbl"><table>
+    <thead><tr><th></th><th>B（U-Net ＋ S&amp;S）</th><th>C（凍結 VAE ＋ S&amp;S）</th></tr></thead>
+    <tbody>
+      <tr><td>Dice，弱監督</td><td class="n"><b>0.8146</b></td><td class="n">0.8014（−0.0132）</td></tr>
+      <tr><td>Dice，無監督</td><td class="n"><b>0.7435</b></td><td class="n">0.7260（−0.0176）</td></tr>
+      <tr><td>B 贏的受試者</td><td class="n" colspan="2">114 / 115（兩種設定都一樣）</td></tr>
+      <tr><td>推論時間（RTX 4090）</td><td class="n">61.2 ms</td><td class="n"><b>20.0 ms</b></td></tr>
+      <tr><td>尖峰記憶體</td><td class="n">3.00 GB</td><td class="n"><b>1.29 GB</b></td></tr>
+    </tbody>
+  </table></div>
+  <p>C 確實比較快、比較省記憶體，可是準確度輸給普通的 U-Net，而且輸得很一致。要誠實解讀這個結果的範圍：</p>
+  <ul>
+    <li>C 和 B 同時差三件事：編碼器是凍結的還是訓練的、VAE 還是 U-Net、速度場是半解析度還是全解析度。所以<b>不能把差距歸因到「生成模型」本身</b>。</li>
+    <li>速度上的好處可能來自編碼器凍結和半解析度的速度場預測（兩者各自的貢獻沒有分開量），這兩個性質都不需要生成模型，所以「更快」也不能算在 VAE 頭上。</li>
+    <li>監督讓差距從 0.0176 縮小到 0.0132，但沒有消除。</li>
+  </ul>
+  <p>把自己的方法檢驗到輸，並把它寫進論文，是這篇很重要的一部分：不是所有新想法都有用，而乾淨的消融實驗的價值，就是讓你能清楚地說出「沒有」。</p>
+</section>
+
+<section id="results">
+  <h2><span class="lesson">summary</span>結果總整理</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>問題</th><th>發現</th><th>關鍵數字</th></tr></thead>
+    <tbody>
+      <tr><td>監督重要嗎？</td><td>對 Dice 的影響大於任何架構差異</td><td class="n">+0.085（115/115 受試者）</td></tr>
+      <tr><td>速度場積分有用嗎？</td><td>弱監督下折疊幾乎歸零，Dice 幾乎不變</td><td class="n">1.080% → 0.000004%</td></tr>
+      <tr><td>有用速度場就夠了嗎？</td><td>不夠；每步相加的模型照樣折疊</td><td class="n">D：81,270 &gt; A：74,325 體素</td></tr>
+      <tr><td>關鍵是什麼？</td><td>步驟是合成還是相加</td><td class="n">48.8 倍</td></tr>
+      <tr><td>凍結 VAE 值得嗎？</td><td>更快，但 Dice 較低</td><td class="n">20.0 vs 61.2 ms；−0.0132</td></tr>
+    </tbody>
+  </table></div>
+  <p>對讀論文的人，最實用的三條建議：</p>
+  <ol class="plain">
+    <li><b>比較模型設計時，固定監督程度</b>，表格要寫明訓練時有沒有用解剖標籤。</li>
+    <li><b>形變場會被下游使用時</b>（例如 tensor-based morphometry、縱向分析），scaling and squaring 是合理的預設，成本只有約 0.0015 Dice。</li>
+    <li><b>只說「用了速度場積分」不夠</b>，要說明各步是怎麼合併的，並且把折疊率和 Dice 一起報告。</li>
+  </ol>
+  <figure>
+    <img src="fig1.png" alt="論文圖一：十個模型的 Dice 對折疊率散布圖" loading="lazy">
+    <figcaption>論文 Fig. 1（取自專案 repo）。和上面互動版是同一份數據。</figcaption>
+  </figure>
+</section>
+
+<section id="limits">
+  <h2><span class="lesson">limitations</span>這篇沒有證明什麼</h2>
+  <p>論文刻意把結論寫得保守。讀的時候要分清楚「發現」和「證明」：</p>
+  <ul>
+    <li><b>一個資料集、一個 atlas、每種設定只訓練一次。</b>115 位受試者都在同一個訓練好的模型之下，p 值只說明那一個檢查點贏得多一致，不是這種設計贏得多可靠。</li>
+    <li><b>小差異要當作偵測不到。</b>我們在同一份資料上量到訓練種子之間約 0.0022 的 Dice 變異，所以 0.0015（積分的代價）和 0.0012（C 對 D）都應該視為看不出來，不管 p 值多小。本文所依據的差異都遠大於這個量。</li>
+    <li><b>E 和 F 也是單一種子。</b>所以它們只用來解讀折疊，Dice 只是報告出來，不下結論。</li>
+    <li><b>所有模型都用 λ = 1。</b>比較是在「相同的正則權重」下，不是「相同的折疊程度」下。調整 λ 會移動各模型在準確度與折疊之間的位置，這是我們後續工作要處理的。</li>
+    <li><b>弱監督模型是用被評分的那些結構訓練的。</b>所以它們的 Dice 不能和無監督方法直接比較。</li>
+    <li><b>訓練預算固定 100 個 epoch</b>，弱監督模型還沒有完全收斂。</li>
+  </ul>
+  <p>把限制寫清楚不是示弱，而是讓讀者知道結果可以相信到什麼程度。</p>
+</section>
+
+<footer>
+  © 2026 賴鉑崴 · 本導讀依據已被接受的論文撰寫，數字與完整細節以<a href="../../papers/GCBME2026_Lai_Chiang_Yang.pdf" target="_blank" rel="noopener">論文原文</a>為準。 · <a href="https://s9988766-creator.github.io">回到首頁</a>
+</footer>
+</div>
+</div>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(t, a, txt) { var e = document.createElementNS(NS, t); for (var k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; return e; }
+  var css = getComputedStyle(document.documentElement);
+  function c(v) { return css.getPropertyValue(v).trim(); }
+
+  /* ---- 1-D compose vs add ---- */
+  var fsvg = document.getElementById('fold');
+  var ampEl = document.getElementById('amp'), nEl = document.getElementById('nst');
+  var M = 400, PI3 = 3 * Math.PI;
+  function u(x, A) { return A * Math.sin(PI3 * x) / PI3; }
+  function curveAdd(A) { var p = []; for (var i = 0; i <= M; i++) { var x = i / M; p.push(x + u(x, A)); } return p; }
+  function curveComp(A, N) {
+    var p = [];
+    for (var i = 0; i <= M; i++) { var x = i / M, y = x; for (var k = 0; k < N; k++) y = y + u(y, A) / N; p.push(y); }
+    return p;
+  }
+  function drawPanel(g, ox, oy, w, h, ys, col, title) {
+    var lo = -0.8, hi = 1.8;
+    function px(x) { return ox + x * w; }
+    function py(y) { return oy + h - (y - lo) / (hi - lo) * h; }
+    g.appendChild(el('rect', { x: ox, y: oy, width: w, height: h, rx: 6, fill: '#fff', 'fill-opacity': 0.5, stroke: c('--line') }));
+    g.appendChild(el('line', { x1: px(0), y1: py(0), x2: px(1), y2: py(1), stroke: c('--fg-dim'), 'stroke-dasharray': '4 4', 'stroke-width': 1 }));
+    var folded = 0, d = '';
+    for (var i = 0; i <= M; i++) { d += (i ? 'L' : 'M') + px(i / M).toFixed(1) + ' ' + py(Math.max(lo, Math.min(hi, ys[i]))).toFixed(1); }
+    g.appendChild(el('path', { d: d, fill: 'none', stroke: col, 'stroke-width': 2.4 }));
+    for (var j = 1; j <= M; j++) {
+      if (ys[j] - ys[j - 1] <= 0) {
+        folded++;
+        g.appendChild(el('line', { x1: px((j - 1) / M), y1: py(Math.max(lo, Math.min(hi, ys[j - 1]))), x2: px(j / M), y2: py(Math.max(lo, Math.min(hi, ys[j]))), stroke: c('--fold'), 'stroke-width': 4.5, 'stroke-linecap': 'round' }));
+      }
+    }
+    g.appendChild(el('text', { x: ox + w / 2, y: oy - 8, 'text-anchor': 'middle', fill: c('--fg'), 'font-weight': 600 }, title));
+    g.appendChild(el('text', { x: ox + w / 2, y: oy + h + 18, 'text-anchor': 'middle', fill: c('--fg-dim') }, '原來的位置 x →'));
+    return folded / M * 100;
+  }
+  function drawFold() {
+    var A = parseFloat(ampEl.value), N = parseInt(nEl.value, 10);
+    document.getElementById('ampv').textContent = A.toFixed(1);
+    document.getElementById('nstv').textContent = N + (N === 128 ? '（≈ 2⁷）' : '');
+    while (fsvg.firstChild) fsvg.removeChild(fsvg.firstChild);
+    var fa = drawPanel(fsvg, 20, 30, 290, 250, curveAdd(A), c('--accent'), '相加：x + u(x)');
+    var fc = drawPanel(fsvg, 330, 30, 290, 250, curveComp(A, N), c('--accent2'), '合成：切成 ' + N + ' 步');
+    fsvg.appendChild(el('text', { x: 165, y: 312, 'text-anchor': 'middle', fill: fa > 0 ? c('--fold') : c('--mint'), 'font-weight': 700, 'font-family': 'JetBrains Mono, monospace' }, '折疊 ' + fa.toFixed(1) + '%'));
+    fsvg.appendChild(el('text', { x: 475, y: 312, 'text-anchor': 'middle', fill: fc > 0 ? c('--fold') : c('--mint'), 'font-weight': 700, 'font-family': 'JetBrains Mono, monospace' }, '折疊 ' + fc.toFixed(1) + '%'));
+    var v = document.getElementById('foldv');
+    if (N === 1) v.textContent = 'N = 1：合成一步就是相加，兩邊完全相同。';
+    else if (A <= 1) v.textContent = 'A ≤ 1：位移斜率不會比 −1 更陡，連相加都不會折疊。把 A 往右拉。';
+    else if (fc === 0) v.textContent = '相加折疊了，合成沒有：每一小步都還是單調的，所以整體保持可逆。';
+    else v.textContent = '合成也折疊了：步子還不夠小，保證存在，但沒拿到。增加 N 或降低 A。';
+  }
+  ampEl.addEventListener('input', drawFold); nEl.addEventListener('input', drawFold);
+  drawFold();
+
+  /* ---- accuracy-topology plane ---- */
+  var psvg = document.getElementById('plane');
+  var runs = [
+    { l: 'A', sup: 0, d: 0.7314, j: 1.662, comp: 0, dx: 10, dy: 4 },
+    { l: 'A', sup: 1, d: 0.8161, j: 1.080, comp: 0, dx: 10, dy: 12 },
+    { l: 'B', sup: 0, d: 0.7435, j: 0.0019, comp: 1, dx: 10, dy: 4 },
+    { l: 'B', sup: 1, d: 0.8146, j: 0.000004, comp: 1, dx: 10, dy: 4 },
+    { l: 'C', sup: 0, d: 0.7260, j: 0.000046, comp: 1, dx: 10, dy: 4 },
+    { l: 'C', sup: 1, d: 0.8014, j: 0.000006, comp: 1, dx: -10, dy: 4, anchor: 'end' },
+    { l: 'D', sup: 0, d: 0.7242, j: 1.189, comp: 0, dx: 10, dy: 4 },
+    { l: 'D', sup: 1, d: 0.8026, j: 1.181, comp: 0, dx: 10, dy: 4 },
+    { l: 'E', sup: 1, d: 0.8177, j: 0.0221, comp: 1, dx: -10, dy: 4, anchor: 'end' },
+    { l: 'F', sup: 1, d: 0.8215, j: 1.078, comp: 0, dx: 10, dy: -4 }
+  ];
+  var L = 62, R = 612, T = 18, B = 318, yl = 0.70, yh = 0.84, xl = -6.4, xh = 0.6;
+  function sx(j) { return L + (Math.log10(j) - xl) / (xh - xl) * (R - L); }
+  function sy(d) { return B - (d - yl) / (yh - yl) * (B - T); }
+  psvg.appendChild(el('rect', { x: L, y: T, width: R - L, height: B - T, rx: 6, fill: '#fff', 'fill-opacity': 0.5, stroke: c('--line') }));
+  [-6, -4, -2, 0].forEach(function (e) {
+    psvg.appendChild(el('line', { x1: sx(Math.pow(10, e)), x2: sx(Math.pow(10, e)), y1: T, y2: B, stroke: c('--line'), 'stroke-width': 1 }));
+    psvg.appendChild(el('text', { x: sx(Math.pow(10, e)), y: B + 18, 'text-anchor': 'middle', fill: c('--fg-dim') }, e === 0 ? '1%' : '10' + ['⁻⁶', '', '⁻⁴', '', '⁻²'][e + 6] + '%'));
+  });
+  [0.70, 0.74, 0.78, 0.82].forEach(function (d) {
+    psvg.appendChild(el('line', { x1: L, x2: R, y1: sy(d), y2: sy(d), stroke: c('--line'), 'stroke-width': 1 }));
+    psvg.appendChild(el('text', { x: L - 8, y: sy(d) + 4, 'text-anchor': 'end', fill: c('--fg-dim') }, d.toFixed(2)));
+  });
+  psvg.appendChild(el('text', { x: (L + R) / 2, y: B + 40, 'text-anchor': 'middle', fill: c('--fg') }, '折疊率 J_neg（對數，越左越好）'));
+  var yt = el('text', { x: 14, y: (T + B) / 2, 'text-anchor': 'middle', fill: c('--fg'), transform: 'rotate(-90 14 ' + (T + B) / 2 + ')' }, 'Dice（越上越好）');
+  psvg.appendChild(yt);
+  runs.forEach(function (r) {
+    var col = r.comp ? c('--accent2') : c('--accent'), x = sx(r.j), y = sy(r.d);
+    psvg.appendChild(el('circle', { cx: x, cy: y, r: 6.5, fill: r.sup ? col : '#fff', 'fill-opacity': r.sup ? 0.9 : 1, stroke: col, 'stroke-width': 2 }));
+    psvg.appendChild(el('text', { x: x + r.dx, y: y + r.dy, 'text-anchor': r.anchor || 'start', fill: c('--fg'), 'font-weight': 700, 'font-size': 13 }, r.l));
+  });
+})();
+</script>
+
+</body>
+</html>
